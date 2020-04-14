@@ -8,6 +8,8 @@ Generate EDM4hep collections from LCIO format data.
 
 Some converters (from LCCollection to EDM4hep collection) are still being in developing.
 
+There is also an algorithm wrapper ![LCIOInput](https://github.com/ihep-sft-group/LCIOInput), by which we can read LCIO with key4hep/K4FWCore in Gaudi.
+
 ## Dependencies
 
 - [LCIO](https://github.com/iLCSoft/LCIO)
