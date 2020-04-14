@@ -34,6 +34,7 @@ add_library(K4LCIOReader SHARED ${sources})
 target_include_directories(K4LCIOReader PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     ${podio_INCLUDE_DIR}
+    ${EDM4HEP_INCLUDE_DIR}
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries(K4LCIOReader ${LCIO_LIBRARIES} podio::podio ${EDM4HEP_DIR}/../../libedm4hep.so)
 target_compile_options(K4LCIOReader PRIVATE -pthread)
