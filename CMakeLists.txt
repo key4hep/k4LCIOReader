@@ -19,6 +19,15 @@ message (STATUS "C++ standard: ${CMAKE_CXX_STANDARD}")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -DDROP_CGAL ${CPP_STANDARD_FLAGS} -Wall -Wextra -Wpedantic -Wno-unused-variable -Wno-unused-parameter")
 
+#--- add version files ---------------------------------------------------------
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/K4LCIOReaderVersion.h
+    ${CMAKE_CURRENT_BINARY_DIR}/K4LCIOReaderVersion.h )
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/K4LCIOReaderVersion.h
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/K4LCIOReader )
+
+#--- add CMake infrastructure --------------------------------------------------
+include(cmake/K4LCIOReaderCreateConfig.cmake)
+
 # - library K4LCIOReader
 file(GLOB sources src/*.cc)
 add_library(K4LCIOReader SHARED ${sources})

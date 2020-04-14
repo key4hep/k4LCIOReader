@@ -18,7 +18,7 @@ Some converters (from LCCollection to EDM4hep collection) are still being in dev
 
 Suppose environment has been set properly, so that all dependencies can be found by CMake.
 
-```
+```shell
 git clone https://github.com/ihep-sft-group/K4LCIOReader.git
 cd K4LCIOReader; mkdir build; cd build
 cmake ..
@@ -28,4 +28,3 @@ make
 ## Contributing
 
 Contributions and bug reports are welcome!
-

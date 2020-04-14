@@ -22,20 +22,22 @@ K4LCIOReader::~K4LCIOReader()
     delete m_converter;
 }
 
-void K4LCIOReader::open(const std::string& filename)
+void K4LCIOReader::open(const std::string &filename)
 {
     open(std::vector<std::string>{filename});
 }
 
-void K4LCIOReader::open(const std::vector<std::string>& filenames)
+void K4LCIOReader::open(const std::vector<std::string> &filenames)
 {
-    if ( isValid() ) {
+    if (isValid())
+    {
         close();
     }
 
     m_reader = IOIMPL::LCFactory::getInstance()->createLCReader();
 
-    for ( const auto& file : filenames ) {
+    for (const auto &file : filenames)
+    {
         m_reader->open(file);
         m_entries += m_reader->getNumberOfEvents();
         m_reader->close();
@@ -46,7 +48,8 @@ void K4LCIOReader::open(const std::vector<std::string>& filenames)
 
 void K4LCIOReader::close()
 {
-    if ( m_reader ) {
+    if (m_reader)
+    {
         m_reader->close();
         delete m_reader;
         m_reader = nullptr;
@@ -54,9 +57,10 @@ void K4LCIOReader::close()
     }
 }
 
-void K4LCIOReader::setReadCollectionNames(const std::vector<std::string>& colnames)
+void K4LCIOReader::setReadCollectionNames(const std::vector<std::string> &colnames)
 {
-    if ( isValid() ) {
+    if (isValid())
+    {
         m_reader->setReadCollectionNames(colnames);
     }
 }
@@ -64,7 +68,8 @@ void K4LCIOReader::setReadCollectionNames(const std::vector<std::string>& colnam
 bool K4LCIOReader::readNextEvent()
 {
     auto evt = m_reader->readNextEvent();
-    if ( ! evt ) {
+    if (!evt)
+    {
         this->close();
         return false;
     }
@@ -79,7 +84,7 @@ bool K4LCIOReader::isValid() const
     return (m_reader != nullptr);
 }
 
-podio::CollectionBase* K4LCIOReader::readCollection(const std::string& name)
+podio::CollectionBase *K4LCIOReader::readCollection(const std::string &name)
 {
     return m_converter->getCollection(name);
 }
