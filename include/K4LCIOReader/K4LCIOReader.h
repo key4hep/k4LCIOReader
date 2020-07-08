@@ -55,6 +55,11 @@ public:
     /// Check if TFile is valid
     virtual bool isValid() const override final;
 
+    /// pure virtual methods that from parent class
+    virtual podio::GenericParameters* readEventMetaData();
+    virtual std::map<int, podio::GenericParameters>* readCollectionMetaData();
+    virtual std::map<int, podio::GenericParameters>* readRunMetaData();
+
 private:
     /// Implementation for collection reading
     podio::CollectionBase *readCollection(const std::string &name) override final;

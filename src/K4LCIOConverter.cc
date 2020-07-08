@@ -106,6 +106,11 @@ static edm4hep::Vector3f Vector3fFrom(const double *v)
     return edm4hep::Vector3f(v[0], v[1], v[2]);
 }
 
+static edm4hep::Vector3f Vector3fFrom(const EVENT::FloatVec& v)
+{
+    return edm4hep::Vector3f(v[0], v[1], v[2]);
+}
+
 podio::CollectionBase *K4LCIOConverter::cnvMCParticleCollection(EVENT::LCCollection *src)
 {
     auto dest = new edm4hep::MCParticleCollection();
@@ -137,8 +142,8 @@ podio::CollectionBase *K4LCIOConverter::cnvMCParticleCollection(EVENT::LCCollect
                 {
                     // A loop for edm4hep's MCParticleCollection to recover the relationship
                     edm4hep::MCParticle lparent = dest->at(k);
-                    lval.addParent(lparent);
-                    lparent.addDaughter(lval);
+                    lval.addToParents(lparent);
+                    lparent.addToDaughters(lval);
                     break;
                 }
             }
@@ -205,7 +210,7 @@ podio::CollectionBase *K4LCIOConverter::cnvTPCHitCollection(EVENT::LCCollection 
         lval.setQuality(rval->getQuality());
         for (unsigned j = 0, M = rval->getNRawDataWords(); j < M; j++)
         {
-            lval.addRawDataWord(rval->getRawDataWord(j));
+            lval.addToRawDataWords(rval->getRawDataWord(j));
         }
     }
 
@@ -250,7 +255,7 @@ podio::CollectionBase *K4LCIOConverter::cnvTrackerHitCollection(EVENT::LCCollect
                                  EVENT::LCObject>("TPCHit", robj);
             if (lobj.isAvailable())
             {
-                lval.addRawHit(lobj.getObjectID());
+                lval.addToRawHits(lobj.getObjectID());
             }
         }
     }
@@ -289,7 +294,7 @@ podio::CollectionBase *K4LCIOConverter::cnvTrackCollection(EVENT::LCCollection *
                                  EVENT::TrackerHit>("TrackerHit", robj);
             if (lobj.isAvailable())
             {
-                lval.addTrackerHit(lobj);
+                lval.addToTrackerHits(lobj);
             }
         }
 
@@ -302,14 +307,14 @@ podio::CollectionBase *K4LCIOConverter::cnvTrackCollection(EVENT::LCCollection *
                                  EVENT::Track>("Track", robj);
             if (lobj.isAvailable())
             {
-                lval.addTrack(lobj);
+                lval.addToTracks(lobj);
             }
         }
 
         // add Sub-detector numbers
         for (auto v : rval->getSubdetectorHitNumbers())
         {
-            lval.addSubDetectorHitNumber(v);
+            lval.addToSubDetectorHitNumbers(v);
         }
 
         // fill the TrackStates
@@ -322,7 +327,7 @@ podio::CollectionBase *K4LCIOConverter::cnvTrackCollection(EVENT::LCCollection *
             {
                 _covMatrix[i] = rCM[i];
             }
-            lval.addTrackState(edm4hep::TrackState{
+            lval.addToTrackStates(edm4hep::TrackState{
                 robj->getLocation(),
                 robj->getD0(),
                 robj->getPhi(),
@@ -360,7 +365,7 @@ podio::CollectionBase *K4LCIOConverter::cnvSimCalorimeterHitCollection(EVENT::LC
         // the CaloHitContribution objects are untracked here... Any solution?
         for (auto j = 0, total = rval->getNMCContributions(); j < total; ++j)
         {
-            lval.addContribution(edm4hep::ConstCaloHitContribution(
+            lval.addToContributions(edm4hep::ConstCaloHitContribution(
                 rval->getPDGCont(j), rval->getEnergyCont(j), rval->getTimeCont(j), rval->getStepPosition(j)));
         }
 
@@ -430,6 +435,7 @@ podio::CollectionBase *K4LCIOConverter::cnvClusterCollection(EVENT::LCCollection
         auto &m = rval->getPositionError();
         lval.setPositionError({m[0], m[1], m[2], m[3], m[4], m[5]});
         lval.setType(rval->getType());
+        lval.setDirectionError(Vector3fFrom(rval->getDirectionError()));
 
         //TODO
         //lval.addCluster();

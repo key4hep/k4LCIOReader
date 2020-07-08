@@ -84,6 +84,24 @@ bool K4LCIOReader::isValid() const
     return (m_reader != nullptr);
 }
 
+podio::GenericParameters* K4LCIOReader::readEventMetaData()
+{
+    //not implemented yet
+    return nullptr;
+}
+
+std::map<int, podio::GenericParameters>* K4LCIOReader::readCollectionMetaData()
+{
+    //not implemented yet
+    return nullptr;
+}
+
+std::map<int, podio::GenericParameters>* K4LCIOReader::readRunMetaData()
+{
+    //not implemented yet
+    return nullptr;
+}
+
 podio::CollectionBase *K4LCIOReader::readCollection(const std::string &name)
 {
     return m_converter->getCollection(name);
