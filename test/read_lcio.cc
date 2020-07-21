@@ -1,4 +1,5 @@
 #include "K4LCIOReader/K4LCIOReader.h"
+#include "edm4hep/EventHeaderCollection.h"
 #include "edm4hep/MCParticleCollection.h"
 #include "edm4hep/SimTrackerHitCollection.h"
 #include "edm4hep/TrackerHitCollection.h"
@@ -21,6 +22,9 @@ int main()
         //auto &col1 = store.get<edm4hep::MCParticleCollection>("MCParticle");
         //std::cout << "MCParticleCollection size: " << col1.size() << std::endl;
         //std::cout << col1 << std::endl;
+
+        auto col0 = reader.getCollection<edm4hep::EventHeaderCollection>("EventHeader");
+        std::cout << *col0 << std::endl;
 
         auto col1 = reader.getCollection<edm4hep::MCParticleCollection>("MCParticle");
         std::cout << "MCParticleCollection size: " << col1->size() << std::endl;

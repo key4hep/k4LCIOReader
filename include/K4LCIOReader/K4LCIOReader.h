@@ -15,6 +15,7 @@ class LCReader;
 namespace podio
 {
 class EventStore;
+class GenericParameters;
 }
 // others
 class K4LCIOConverter;

@@ -2,6 +2,7 @@
 #include "K4LCIOConverter.h"
 
 #include "podio/CollectionIDTable.h"
+#include "podio/GenericParameters.h"
 #include "IO/LCReader.h"
 #include "IOIMPL/LCFactory.h"
 

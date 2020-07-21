@@ -22,6 +22,7 @@ public:
 
 private:
     // convertion functions
+    podio::CollectionBase *cnvEventHeader();
     podio::CollectionBase *cnvMCParticleCollection(EVENT::LCCollection *src);
     podio::CollectionBase *cnvSimTrackerHitCollection(EVENT::LCCollection *src);
     podio::CollectionBase *cnvTPCHitCollection(EVENT::LCCollection *src);
@@ -30,7 +31,9 @@ private:
     podio::CollectionBase *cnvSimCalorimeterHitCollection(EVENT::LCCollection *src);
     podio::CollectionBase *cnvRawCalorimeterHitCollection(EVENT::LCCollection *src);
     podio::CollectionBase *cnvCalorimeterHitCollection(EVENT::LCCollection *src);
+    podio::CollectionBase *cnvParticleIDCollection(EVENT::LCCollection *src);
     podio::CollectionBase *cnvClusterCollection(EVENT::LCCollection *src);
+    podio::CollectionBase *cnvVertexCollection(EVENT::LCCollection *src);
     podio::CollectionBase *cnvReconstructedParticleCollection(EVENT::LCCollection *src);
     podio::CollectionBase *cnvAssociationCollection(EVENT::LCCollection *src);
 
