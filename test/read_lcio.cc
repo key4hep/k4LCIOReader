@@ -4,6 +4,7 @@
 #include "edm4hep/SimTrackerHitCollection.h"
 #include "edm4hep/TrackerHitCollection.h"
 #include "edm4hep/TrackCollection.h"
+#include "edm4hep/MCRecoParticleAssociationCollection.h"
 #include "podio/EventStore.h"
 
 int main()
@@ -42,10 +43,15 @@ int main()
         std::cout << "MarlinTrkTracks size: " << col4->size() << std::endl;
         std::cout << *col4 << std::endl;
 
+        auto col5 = reader.getCollection<edm4hep::MCRecoParticleAssociationCollection>("RecoMCTruthLink");
+        std::cout << "RecoMCTruthLink size: " << col5->size() << std::endl;
+        std::cout << *col5 << std::endl;
+
         delete col1;
         delete col2;
         delete col3;
         delete col4;
+        delete col5;
 
         //break;
     }

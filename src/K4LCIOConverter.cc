@@ -14,6 +14,7 @@
 #include "EVENT/Vertex.h"
 #include "EVENT/ReconstructedParticle.h"
 #include "EVENT/LCRelation.h"
+#include "EVENT/LCParameters.h"
 
 //EDM4hep headers
 #include "edm4hep/EventHeaderCollection.h"
@@ -112,7 +113,7 @@ podio::CollectionBase *K4LCIOConverter::getCollection(const std::string &name)
 
     // put result in data holders
     m_name2dest[name] = dest;
-    m_type2cols[name].push_back(std::make_pair(src, dest));
+    m_type2cols[src->getTypeName()].push_back(std::make_pair(src, dest));
 
     return dest;
 }
@@ -735,6 +736,56 @@ podio::CollectionBase *K4LCIOConverter::cnvReconstructedParticleCollection(EVENT
 
 podio::CollectionBase *K4LCIOConverter::cnvAssociationCollection(EVENT::LCCollection *src)
 {
+    unsigned nTotal = src->getNumberOfElements();
+    if (nTotal == 0) {
+        return nullptr;
+    }
+
+    podio::CollectionBase* result = nullptr;
+
+    auto& para = src->getParameters();
+    auto& fromType = para.getStringVal("FromType");
+    auto& toType = para.getStringVal("ToType");
+
+    if ( fromType == "ReconstructedParticle" && toType == "MCParticle" ) {
+        // get all collections that this collection depends on
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "MCParticle")
+                getCollection(v.first);
+        });
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "ReconstructedParticle")
+                getCollection(v.first);
+        });
+
+        auto dest = new edm4hep::MCRecoParticleAssociationCollection();
+
+        // here is the concrete convertions
+        for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
+        {
+            auto rval = (EVENT::LCRelation *)src->getElementAt(i);
+            edm4hep::MCRecoParticleAssociation lval = dest->create();
+
+            // find and set the associated data objects
+            auto rFrom = (EVENT::ReconstructedParticle *)rval->getFrom();
+            auto lFrom =
+                getCorresponding<edm4hep::ReconstructedParticle, edm4hep::ReconstructedParticleCollection,
+                                 EVENT::ReconstructedParticle>("ReconstructedParticle", rFrom);
+            lval.setRec(lFrom);
+
+            auto rTo = (EVENT::MCParticle *)rval->getTo();
+            auto lTo =
+                getCorresponding<edm4hep::MCParticle, edm4hep::MCParticleCollection,
+                                 EVENT::MCParticle>("MCParticle", rTo);
+            lval.setSim(lTo);
+
+            lval.setWeight(rval->getWeight());
+        }
+
+        result = dest;
+    }
     //TODO
-    return nullptr;
+    //else if () {}
+
+    return result;
 }
