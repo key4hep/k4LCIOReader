@@ -764,6 +764,7 @@ podio::CollectionBase *K4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
         {
             auto rval = (EVENT::LCRelation *)src->getElementAt(i);
+            if((EVENT::ReconstructedParticle *)rval->getFrom()==0 || (EVENT::MCParticle *)rval->getTo()==0) continue;//remove 0
             edm4hep::MCRecoParticleAssociation lval = dest->create();
 
             // find and set the associated data objects
@@ -784,8 +785,86 @@ podio::CollectionBase *K4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
 
         result = dest;
     }
-    //TODO
-    //else if () {}
+    else if ( fromType == "CalorimeterHit" && toType == "SimCalorimeterHit" ) {
+        // get all collections that this collection depends on
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "CalorimeterHit")
+                getCollection(v.first);
+        });
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "SimCalorimeterHit")
+                getCollection(v.first);
+        });
+
+        auto dest = new edm4hep::MCRecoCaloAssociationCollection();
+
+        // here is the concrete convertions
+        for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
+        {
+            auto rval = (EVENT::LCRelation *)src->getElementAt(i);
+            if((EVENT::CalorimeterHit *)rval->getFrom()==0 || (EVENT::SimCalorimeterHit *)rval->getTo()==0) continue;//remove 0
+            edm4hep::MCRecoCaloAssociation lval = dest->create();
+
+            // find and set the associated data objects
+            auto rFrom = (EVENT::CalorimeterHit *)rval->getFrom();
+            auto lFrom =
+                getCorresponding<edm4hep::CalorimeterHit, edm4hep::CalorimeterHitCollection,
+                                 EVENT::CalorimeterHit>("CalorimeterHit", rFrom);
+            lval.setRec(lFrom);
+
+            auto rTo = (EVENT::SimCalorimeterHit *)rval->getTo();
+            auto lTo =
+                getCorresponding<edm4hep::SimCalorimeterHit, edm4hep::SimCalorimeterHitCollection,
+                                 EVENT::SimCalorimeterHit>("SimCalorimeterHit", rTo);
+            lval.setSim(lTo);
+
+            lval.setWeight(rval->getWeight());
+        }
+
+        result = dest;
+    }
+    else if ( fromType == "TrackerHit" && toType == "SimTrackerHit" ) {
+        // get all collections that this collection depends on
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "TrackerHit")
+                getCollection(v.first);
+        });
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "SimTrackerHit")
+                getCollection(v.first);
+        });
+
+        auto dest = new edm4hep::MCRecoTrackerAssociationCollection();
+
+        // here is the concrete convertions
+        for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
+        {
+            auto rval = (EVENT::LCRelation *)src->getElementAt(i);
+            if((EVENT::TrackerHit *)rval->getFrom()==0 || (EVENT::SimTrackerHit *)rval->getTo()==0) continue;//remove 0
+            edm4hep::MCRecoTrackerAssociation lval = dest->create();
+
+            // find and set the associated data objects
+            auto rFrom = (EVENT::TrackerHit *)rval->getFrom();
+            auto lFrom =
+                getCorresponding<edm4hep::TrackerHit, edm4hep::TrackerHitCollection,
+                                 EVENT::TrackerHit>("TrackerHit", rFrom);
+            lval.setRec(lFrom);
+
+            auto rTo = (EVENT::SimTrackerHit *)rval->getTo();
+            auto lTo =
+                getCorresponding<edm4hep::SimTrackerHit, edm4hep::SimTrackerHitCollection,
+                                 EVENT::SimTrackerHit>("SimTrackerHit", rTo);
+            lval.setSim(lTo);
+
+            lval.setWeight(rval->getWeight());
+        }
+
+        result = dest;
+    }
+    else {
+        std::cout<<"Error, Don't find correct fromType="<<fromType<<" or toType="<<toType<<", stop here."<<std::endl; 
+        throw;
+    }
 
     return result;
 }
