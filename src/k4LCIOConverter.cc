@@ -1,4 +1,4 @@
-#include "K4LCIOConverter.h"
+#include "k4LCIOConverter.h"
 
 //LCIO headers
 #include "EVENT/MCParticle.h"
@@ -34,29 +34,29 @@
 #include "edm4hep/MCRecoCaloAssociationCollection.h"
 #include "edm4hep/MCRecoParticleAssociationCollection.h"
 
-K4LCIOConverter::K4LCIOConverter(podio::CollectionIDTable *table)
+k4LCIOConverter::k4LCIOConverter(podio::CollectionIDTable *table)
     : m_table(table)
 {
-    m_cnv["MCParticle"] = &K4LCIOConverter::cnvMCParticleCollection;
-    m_cnv["SimTrackerHit"] = &K4LCIOConverter::cnvSimTrackerHitCollection;
-    m_cnv["TPCHit"] = &K4LCIOConverter::cnvTPCHitCollection;
-    m_cnv["TrackerHit"] = &K4LCIOConverter::cnvTrackerHitCollection;
-    m_cnv["Track"] = &K4LCIOConverter::cnvTrackCollection;
-    m_cnv["SimCalorimeterHit"] = &K4LCIOConverter::cnvSimCalorimeterHitCollection;
-    m_cnv["RawCalorimeterHit"] = &K4LCIOConverter::cnvRawCalorimeterHitCollection;
-    m_cnv["CalorimeterHit"] = &K4LCIOConverter::cnvCalorimeterHitCollection;
-    m_cnv["ParticleID"] = &K4LCIOConverter::cnvParticleIDCollection;
-    m_cnv["Cluster"] = &K4LCIOConverter::cnvClusterCollection;
-    m_cnv["Vertex"] = &K4LCIOConverter::cnvVertexCollection;
-    m_cnv["ReconstructedParticle"] = &K4LCIOConverter::cnvReconstructedParticleCollection;
-    m_cnv["LCRelation"] = &K4LCIOConverter::cnvAssociationCollection;
+    m_cnv["MCParticle"] = &k4LCIOConverter::cnvMCParticleCollection;
+    m_cnv["SimTrackerHit"] = &k4LCIOConverter::cnvSimTrackerHitCollection;
+    m_cnv["TPCHit"] = &k4LCIOConverter::cnvTPCHitCollection;
+    m_cnv["TrackerHit"] = &k4LCIOConverter::cnvTrackerHitCollection;
+    m_cnv["Track"] = &k4LCIOConverter::cnvTrackCollection;
+    m_cnv["SimCalorimeterHit"] = &k4LCIOConverter::cnvSimCalorimeterHitCollection;
+    m_cnv["RawCalorimeterHit"] = &k4LCIOConverter::cnvRawCalorimeterHitCollection;
+    m_cnv["CalorimeterHit"] = &k4LCIOConverter::cnvCalorimeterHitCollection;
+    m_cnv["ParticleID"] = &k4LCIOConverter::cnvParticleIDCollection;
+    m_cnv["Cluster"] = &k4LCIOConverter::cnvClusterCollection;
+    m_cnv["Vertex"] = &k4LCIOConverter::cnvVertexCollection;
+    m_cnv["ReconstructedParticle"] = &k4LCIOConverter::cnvReconstructedParticleCollection;
+    m_cnv["LCRelation"] = &k4LCIOConverter::cnvAssociationCollection;
 }
 
-K4LCIOConverter::~K4LCIOConverter()
+k4LCIOConverter::~k4LCIOConverter()
 {
 }
 
-void K4LCIOConverter::set(EVENT::LCEvent *evt)
+void k4LCIOConverter::set(EVENT::LCEvent *evt)
 {
     m_name2src.clear();
     m_name2dest.clear();
@@ -70,7 +70,7 @@ void K4LCIOConverter::set(EVENT::LCEvent *evt)
     }
 }
 
-podio::CollectionBase *K4LCIOConverter::getCollection(const std::string &name)
+podio::CollectionBase *k4LCIOConverter::getCollection(const std::string &name)
 {
     // if already exist
     auto idest = m_name2dest.find(name);
@@ -128,7 +128,7 @@ static edm4hep::Vector3f Vector3fFrom(const EVENT::FloatVec& v)
     return edm4hep::Vector3f(v[0], v[1], v[2]);
 }
 
-podio::CollectionBase *K4LCIOConverter::cnvEventHeader()
+podio::CollectionBase *k4LCIOConverter::cnvEventHeader()
 {
     auto dest = new edm4hep::EventHeaderCollection();
 
@@ -141,7 +141,7 @@ podio::CollectionBase *K4LCIOConverter::cnvEventHeader()
     return dest;
 }
 
-podio::CollectionBase *K4LCIOConverter::cnvMCParticleCollection(EVENT::LCCollection *src)
+podio::CollectionBase *k4LCIOConverter::cnvMCParticleCollection(EVENT::LCCollection *src)
 {
     auto dest = new edm4hep::MCParticleCollection();
 
@@ -183,7 +183,7 @@ podio::CollectionBase *K4LCIOConverter::cnvMCParticleCollection(EVENT::LCCollect
     return dest;
 }
 
-podio::CollectionBase *K4LCIOConverter::cnvSimTrackerHitCollection(EVENT::LCCollection *src)
+podio::CollectionBase *k4LCIOConverter::cnvSimTrackerHitCollection(EVENT::LCCollection *src)
 {
     auto dest = new edm4hep::SimTrackerHitCollection();
 
@@ -225,7 +225,7 @@ podio::CollectionBase *K4LCIOConverter::cnvSimTrackerHitCollection(EVENT::LCColl
     return dest;
 }
 
-podio::CollectionBase *K4LCIOConverter::cnvTPCHitCollection(EVENT::LCCollection *src)
+podio::CollectionBase *k4LCIOConverter::cnvTPCHitCollection(EVENT::LCCollection *src)
 {
     auto dest = new edm4hep::TPCHitCollection();
 
@@ -247,7 +247,7 @@ podio::CollectionBase *K4LCIOConverter::cnvTPCHitCollection(EVENT::LCCollection 
     return dest;
 }
 
-podio::CollectionBase *K4LCIOConverter::cnvTrackerHitCollection(EVENT::LCCollection *src)
+podio::CollectionBase *k4LCIOConverter::cnvTrackerHitCollection(EVENT::LCCollection *src)
 {
     auto dest = new edm4hep::TrackerHitCollection();
 
@@ -293,7 +293,7 @@ podio::CollectionBase *K4LCIOConverter::cnvTrackerHitCollection(EVENT::LCCollect
     return dest;
 }
 
-podio::CollectionBase *K4LCIOConverter::cnvTrackCollection(EVENT::LCCollection *src)
+podio::CollectionBase *k4LCIOConverter::cnvTrackCollection(EVENT::LCCollection *src)
 {
     auto dest = new edm4hep::TrackCollection();
 
@@ -372,7 +372,7 @@ podio::CollectionBase *K4LCIOConverter::cnvTrackCollection(EVENT::LCCollection *
     return dest;
 }
 
-podio::CollectionBase *K4LCIOConverter::cnvSimCalorimeterHitCollection(EVENT::LCCollection *src)
+podio::CollectionBase *k4LCIOConverter::cnvSimCalorimeterHitCollection(EVENT::LCCollection *src)
 {
     auto dest = new edm4hep::SimCalorimeterHitCollection();
 
@@ -412,7 +412,7 @@ podio::CollectionBase *K4LCIOConverter::cnvSimCalorimeterHitCollection(EVENT::LC
     return dest;
 }
 
-podio::CollectionBase *K4LCIOConverter::cnvRawCalorimeterHitCollection(EVENT::LCCollection *src)
+podio::CollectionBase *k4LCIOConverter::cnvRawCalorimeterHitCollection(EVENT::LCCollection *src)
 {
     auto dest = new edm4hep::RawCalorimeterHitCollection();
 
@@ -431,7 +431,7 @@ podio::CollectionBase *K4LCIOConverter::cnvRawCalorimeterHitCollection(EVENT::LC
     return dest;
 }
 
-podio::CollectionBase *K4LCIOConverter::cnvCalorimeterHitCollection(EVENT::LCCollection *src)
+podio::CollectionBase *k4LCIOConverter::cnvCalorimeterHitCollection(EVENT::LCCollection *src)
 {
     auto dest = new edm4hep::CalorimeterHitCollection();
 
@@ -455,7 +455,7 @@ podio::CollectionBase *K4LCIOConverter::cnvCalorimeterHitCollection(EVENT::LCCol
     return dest;
 }
 
-podio::CollectionBase *K4LCIOConverter::cnvParticleIDCollection(EVENT::LCCollection *src)
+podio::CollectionBase *k4LCIOConverter::cnvParticleIDCollection(EVENT::LCCollection *src)
 {
     auto dest = new edm4hep::ParticleIDCollection();
 
@@ -478,7 +478,7 @@ podio::CollectionBase *K4LCIOConverter::cnvParticleIDCollection(EVENT::LCCollect
     return dest;
 }
 
-podio::CollectionBase *K4LCIOConverter::cnvClusterCollection(EVENT::LCCollection *src)
+podio::CollectionBase *k4LCIOConverter::cnvClusterCollection(EVENT::LCCollection *src)
 {
     auto dest = new edm4hep::ClusterCollection();
 
@@ -574,7 +574,7 @@ podio::CollectionBase *K4LCIOConverter::cnvClusterCollection(EVENT::LCCollection
     return dest;
 }
 
-podio::CollectionBase *K4LCIOConverter::cnvVertexCollection(EVENT::LCCollection *src)
+podio::CollectionBase *k4LCIOConverter::cnvVertexCollection(EVENT::LCCollection *src)
 {
     auto dest = new edm4hep::VertexCollection();
 
@@ -602,7 +602,7 @@ podio::CollectionBase *K4LCIOConverter::cnvVertexCollection(EVENT::LCCollection 
     return dest;
 }
 
-podio::CollectionBase *K4LCIOConverter::cnvReconstructedParticleCollection(EVENT::LCCollection *src)
+podio::CollectionBase *k4LCIOConverter::cnvReconstructedParticleCollection(EVENT::LCCollection *src)
 {
     auto dest = new edm4hep::ReconstructedParticleCollection();
 
@@ -734,7 +734,7 @@ podio::CollectionBase *K4LCIOConverter::cnvReconstructedParticleCollection(EVENT
     return dest;
 }
 
-podio::CollectionBase *K4LCIOConverter::cnvAssociationCollection(EVENT::LCCollection *src)
+podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollection *src)
 {
     unsigned nTotal = src->getNumberOfElements();
     if (nTotal == 0) {

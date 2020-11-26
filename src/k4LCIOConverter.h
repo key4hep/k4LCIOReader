@@ -1,5 +1,5 @@
-#ifndef K4_LCIO_CONVERTER_H
-#define K4_LCIO_CONVERTER_H
+#ifndef k4_LCIO_CONVERTER_H
+#define k4_LCIO_CONVERTER_H
 
 #include "EVENT/LCEvent.h"
 #include "EVENT/LCCollection.h"
@@ -10,11 +10,11 @@
 #include <vector>
 #include <map>
 
-class K4LCIOConverter
+class k4LCIOConverter
 {
 public:
-    K4LCIOConverter(podio::CollectionIDTable *table);
-    ~K4LCIOConverter();
+    k4LCIOConverter(podio::CollectionIDTable *table);
+    ~k4LCIOConverter();
 
     void set(EVENT::LCEvent *evt);
 
@@ -41,7 +41,7 @@ private:
     template <typename edm4hep_t,typename edm4hep_col_t, typename LCIO_t>
     edm4hep_t getCorresponding(const std::string &type, LCIO_t *rvar);
 
-    typedef podio::CollectionBase *(K4LCIOConverter::*cnvfunc)(EVENT::LCCollection *);
+    typedef podio::CollectionBase *(k4LCIOConverter::*cnvfunc)(EVENT::LCCollection *);
     // key: collection type, value: corresponding convertion function
     std::map<std::string, cnvfunc> m_cnv;
 
@@ -59,7 +59,7 @@ private:
 };
 
 template <typename edm4hep_t, typename edm4hep_col_t, typename LCIO_t>
-edm4hep_t K4LCIOConverter::getCorresponding(const std::string &type, LCIO_t *robj)
+edm4hep_t k4LCIOConverter::getCorresponding(const std::string &type, LCIO_t *robj)
 {
     // loop all collections in the same type
     for (auto &colpair : m_type2cols[type])
