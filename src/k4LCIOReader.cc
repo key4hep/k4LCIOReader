@@ -1,5 +1,5 @@
-#include "K4LCIOReader/K4LCIOReader.h"
-#include "K4LCIOConverter.h"
+#include "k4LCIOReader/k4LCIOReader.h"
+#include "k4LCIOConverter.h"
 
 #include "podio/CollectionIDTable.h"
 #include "podio/GenericParameters.h"
@@ -8,27 +8,27 @@
 
 #include <iostream>
 
-K4LCIOReader::K4LCIOReader()
+k4LCIOReader::k4LCIOReader()
     : m_entries(0),
       m_reader(nullptr)
 {
     m_table = new podio::CollectionIDTable();
-    m_converter = new K4LCIOConverter(m_table);
+    m_converter = new k4LCIOConverter(m_table);
 }
 
-K4LCIOReader::~K4LCIOReader()
+k4LCIOReader::~k4LCIOReader()
 {
     //terminate
     close();
     delete m_converter;
 }
 
-void K4LCIOReader::open(const std::string &filename)
+void k4LCIOReader::open(const std::string &filename)
 {
     open(std::vector<std::string>{filename});
 }
 
-void K4LCIOReader::open(const std::vector<std::string> &filenames)
+void k4LCIOReader::open(const std::vector<std::string> &filenames)
 {
     if (isValid())
     {
@@ -47,7 +47,7 @@ void K4LCIOReader::open(const std::vector<std::string> &filenames)
     m_reader->open(filenames);
 }
 
-void K4LCIOReader::close()
+void k4LCIOReader::close()
 {
     if (m_reader)
     {
@@ -58,7 +58,7 @@ void K4LCIOReader::close()
     }
 }
 
-void K4LCIOReader::setReadCollectionNames(const std::vector<std::string> &colnames)
+void k4LCIOReader::setReadCollectionNames(const std::vector<std::string> &colnames)
 {
     if (isValid())
     {
@@ -66,7 +66,7 @@ void K4LCIOReader::setReadCollectionNames(const std::vector<std::string> &colnam
     }
 }
 
-bool K4LCIOReader::readNextEvent()
+bool k4LCIOReader::readNextEvent()
 {
     auto evt = m_reader->readNextEvent();
     if (!evt)
@@ -80,30 +80,30 @@ bool K4LCIOReader::readNextEvent()
     return true;
 }
 
-bool K4LCIOReader::isValid() const
+bool k4LCIOReader::isValid() const
 {
     return (m_reader != nullptr);
 }
 
-podio::GenericParameters* K4LCIOReader::readEventMetaData()
+podio::GenericParameters* k4LCIOReader::readEventMetaData()
 {
     //not implemented yet
     return nullptr;
 }
 
-std::map<int, podio::GenericParameters>* K4LCIOReader::readCollectionMetaData()
+std::map<int, podio::GenericParameters>* k4LCIOReader::readCollectionMetaData()
 {
     //not implemented yet
     return nullptr;
 }
 
-std::map<int, podio::GenericParameters>* K4LCIOReader::readRunMetaData()
+std::map<int, podio::GenericParameters>* k4LCIOReader::readRunMetaData()
 {
     //not implemented yet
     return nullptr;
 }
 
-podio::CollectionBase *K4LCIOReader::readCollection(const std::string &name)
+podio::CollectionBase *k4LCIOReader::readCollection(const std::string &name)
 {
     return m_converter->getCollection(name);
 }

@@ -1,5 +1,5 @@
-#ifndef K4_LCIOREADER_H
-#define K4_LCIOREADER_H
+#ifndef k4_LCIOREADER_H
+#define k4_LCIOREADER_H
 
 #include "podio/IReader.h"
 #include "podio/CollectionIDTable.h"
@@ -18,15 +18,15 @@ class EventStore;
 class GenericParameters;
 }
 // others
-class K4LCIOConverter;
+class k4LCIOConverter;
 
-class K4LCIOReader : public podio::IReader
+class k4LCIOReader : public podio::IReader
 {
     friend podio::EventStore;
 
 public:
-    K4LCIOReader();
-    ~K4LCIOReader();
+    k4LCIOReader();
+    ~k4LCIOReader();
 
     void open(const std::string &filename);
     void open(const std::vector<std::string> &filenames);
@@ -72,14 +72,14 @@ private:
     IO::LCReader *m_reader;
 
     //the converter
-    K4LCIOConverter *m_converter;
+    k4LCIOConverter *m_converter;
 
     ///...
     podio::CollectionIDTable *m_table;
 };
 
 template <typename T>
-T *K4LCIOReader::getCollection(const std::string &name)
+T *k4LCIOReader::getCollection(const std::string &name)
 {
     auto p = dynamic_cast<T *>(readCollection(name));
     if (p == nullptr)

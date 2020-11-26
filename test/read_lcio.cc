@@ -1,4 +1,4 @@
-#include "K4LCIOReader/K4LCIOReader.h"
+#include "k4LCIOReader/k4LCIOReader.h"
 #include "edm4hep/EventHeaderCollection.h"
 #include "edm4hep/MCParticleCollection.h"
 #include "edm4hep/SimTrackerHitCollection.h"
@@ -9,7 +9,7 @@
 
 int main()
 {
-    auto reader = K4LCIOReader();
+    auto reader = k4LCIOReader();
     reader.open( "lciodata.slcio" );
 
     auto store = podio::EventStore();
