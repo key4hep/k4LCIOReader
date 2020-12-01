@@ -60,6 +60,7 @@ public:
     virtual podio::GenericParameters* readEventMetaData();
     virtual std::map<int, podio::GenericParameters>* readCollectionMetaData();
     virtual std::map<int, podio::GenericParameters>* readRunMetaData();
+    virtual void endOfEvent();
 
 private:
     /// Implementation for collection reading

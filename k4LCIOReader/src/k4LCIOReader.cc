@@ -103,6 +103,11 @@ std::map<int, podio::GenericParameters>* k4LCIOReader::readRunMetaData()
     return nullptr;
 }
 
+void k4LCIOReader::endOfEvent()
+{
+    //not implemented yet
+}
+
 podio::CollectionBase *k4LCIOReader::readCollection(const std::string &name)
 {
     return m_converter->getCollection(name);
