@@ -1,5 +1,5 @@
 #include "LCIOInput.h"
-#include "FWCore/DataWrapper.h"
+#include "k4FWCore/DataWrapper.h"
 
 #include "edm4hep/MCParticleCollection.h"
 #include "edm4hep/SimTrackerHitCollection.h"
