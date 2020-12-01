@@ -2,7 +2,7 @@
 #define K4_LCIO_INPUT_H
 
 #include "k4LCIOReader/k4LCIOReader.h"
-#include "FWCore/DataHandle.h"
+#include "k4FWCore/DataHandle.h"
 #include "GaudiAlg/GaudiAlgorithm.h"
 
 #include <string>
