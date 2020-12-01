@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.8)
 
+
+option(BUILD_LCIOINPUT_IN_GAUDI "whether build the LCIOInput algorithm wrapper in Gaudi" ON)
+option(BUILD_TESTING "whether build the test(s)" OFF)
+
 find_package(ROOT COMPONENTS RIO Tree)
 
 #---------------------------------------------------------------

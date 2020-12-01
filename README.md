@@ -6,15 +6,11 @@ Generate EDM4hep collections from LCIO format data.
 
 There are 2 modules in this project, k4LCIOReader and LCIOInput.
 
-### Submodule k4LCIOReader
+- Submodule LCIOInput: An algorithm wrapper of k4LCIOReader in Gaudi that can cooperate with k4FWCore.
 
-In this module, `k4LCIOReader` is a subclass that inherits from `podio::IReader`. And it holds an instance of `LCIO::LCReader`.
+- Submodule k4LCIOReader: In this module, `k4LCIOReader` is a subclass that inherits from `podio::IReader`. And it holds an instance of `LCIO::LCReader`.
 
 ![k4LCIOReader](k4LCIOReader.png)
-
-### Submodule LCIOInput
-
-An algorithm wrapper of k4LCIOReader in Gaudi that can cooperate with k4FWCore.
 
 ## Dependencies
 
