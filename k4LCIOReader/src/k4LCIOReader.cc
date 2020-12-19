@@ -19,20 +19,20 @@ k4LCIOReader::k4LCIOReader()
 k4LCIOReader::~k4LCIOReader()
 {
     //terminate
-    close();
+    closeFiles();
     delete m_converter;
 }
 
-void k4LCIOReader::open(const std::string &filename)
+void k4LCIOReader::openFile(const std::string &filename)
 {
-    open(std::vector<std::string>{filename});
+    openFiles(std::vector<std::string>{filename});
 }
 
-void k4LCIOReader::open(const std::vector<std::string> &filenames)
+void k4LCIOReader::openFiles(const std::vector<std::string> &filenames)
 {
     if (isValid())
     {
-        close();
+        closeFile();
     }
 
     m_reader = IOIMPL::LCFactory::getInstance()->createLCReader();
@@ -47,7 +47,7 @@ void k4LCIOReader::open(const std::vector<std::string> &filenames)
     m_reader->open(filenames);
 }
 
-void k4LCIOReader::close()
+void k4LCIOReader::closeFile()
 {
     if (m_reader)
     {
@@ -57,6 +57,18 @@ void k4LCIOReader::close()
         m_entries = 0;
     }
 }
+
+void k4LCIOReader::closeFiles()
+{
+    if (m_reader)
+    {
+        m_reader->close();
+        delete m_reader;
+        m_reader = nullptr;
+        m_entries = 0;
+    }
+}
+
 
 void k4LCIOReader::setReadCollectionNames(const std::vector<std::string> &colnames)
 {
@@ -71,7 +83,7 @@ bool k4LCIOReader::readNextEvent()
     auto evt = m_reader->readNextEvent();
     if (!evt)
     {
-        this->close();
+        this->closeFiles();
         return false;
     }
 

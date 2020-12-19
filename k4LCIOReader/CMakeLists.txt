@@ -2,14 +2,16 @@ find_package(LCIO REQUIRED)
 find_package(podio REQUIRED)
 find_package(EDM4HEP REQUIRED)
 
-gaudi_subdir(k4LCIOReader v0r2)
-
 gaudi_add_library(k4LCIOReader
-                 src/*.cc
-                 INCLUDE_DIRS ${LCIO_INCLUDE_DIRS} podio::podio EDM4HEP::edm4hep
-                 LINK_LIBRARIES ${LCIO_LIBRARIES} podio::podio EDM4HEP::edm4hep)
+                 SOURCES src/k4LCIOReader.cc
+                         src/k4LCIOConverter.cc
+                 LINK ${LCIO_LIBRARIES} 
+                      podio::podio
+                      EDM4HEP::edm4hep)
 
-gaudi_install_headers(k4LCIOReader)
+target_include_directories(k4LCIOReader PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 # - test
 if(BUILD_TESTING)
