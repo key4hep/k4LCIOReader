@@ -8,4 +8,11 @@ if(BUILD_LCIOINPUT_IN_GAUDI)
                           Gaudi::GaudiAlgLib
                           Gaudi::GaudiKernel 
                           EDM4HEP::edm4hep)
+
+    install(TARGETS LCIOInput
+      EXPORT k4LCIOReaderTargets
+      RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT bin
+      LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT shlib
+      COMPONENT dev)
+
 endif()

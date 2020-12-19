@@ -28,3 +28,12 @@ endif()
 
 add_subdirectory(k4LCIOReader)
 add_subdirectory(LCIOInput)
+
+install(EXPORT ${PROJECT_NAME}Targets
+  NAMESPACE ${PROJECT_NAME}::
+  FILE "${PROJECT_NAME}Targets.cmake"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/"
+  )
+
+gaudi_install(CMAKE cmake/${PROJECT_NAME}Config.cmake)
+

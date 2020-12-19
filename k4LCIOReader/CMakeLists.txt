@@ -21,3 +21,9 @@ if(BUILD_TESTING)
     target_link_libraries(read_lcio k4LCIOReader)
     add_test(NAME read_lcio COMMAND read_lcio)
 endif()
+
+install(TARGETS k4LCIOReader
+  EXPORT k4LCIOReaderTargets
+  RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" COMPONENT bin
+  LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" COMPONENT shlib
+  COMPONENT dev)
