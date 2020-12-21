@@ -109,7 +109,7 @@ StatusCode LCIOInput::initialize()
         colNames.push_back(colName);
     }
 
-    m_lcioReader.open(m_files);
+    m_lcioReader.openFiles(m_files);
     m_lcioReader.setReadCollectionNames(colNames);
 
     m_incidentSvc = service( "IncidentSvc", true  );
@@ -186,7 +186,7 @@ StatusCode LCIOInput::finalize()
 {
   info() << "totally read " << m_nEvents << " events" << endmsg;
 
-  m_lcioReader.close();
+  m_lcioReader.closeFiles();
 
   for ( auto& dh : m_dataHandles ) {
       delete dh.second;

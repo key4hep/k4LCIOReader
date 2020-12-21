@@ -28,9 +28,10 @@ public:
     k4LCIOReader();
     ~k4LCIOReader();
 
-    void open(const std::string &filename);
-    void open(const std::vector<std::string> &filenames);
-    void close();
+    void openFile(const std::string &filename);
+    void openFiles(const std::vector<std::string> &filenames);
+    void closeFile();
+    void closeFiles();
 
     void setReadCollectionNames(const std::vector<std::string> &colnames);
 
