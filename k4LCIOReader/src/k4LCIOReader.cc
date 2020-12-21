@@ -60,13 +60,7 @@ void k4LCIOReader::closeFile()
 
 void k4LCIOReader::closeFiles()
 {
-    if (m_reader)
-    {
-        m_reader->close();
-        delete m_reader;
-        m_reader = nullptr;
-        m_entries = 0;
-    }
+    this->closeFile();
 }
 
 
