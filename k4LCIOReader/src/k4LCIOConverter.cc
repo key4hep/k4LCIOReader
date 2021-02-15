@@ -1,4 +1,4 @@
-#include "k4LCIOConverter.h"
+#include "k4LCIOReader/k4LCIOConverter.h"
 
 //LCIO headers
 #include "EVENT/MCParticle.h"

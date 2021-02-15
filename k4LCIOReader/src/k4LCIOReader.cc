@@ -1,5 +1,5 @@
 #include "k4LCIOReader/k4LCIOReader.h"
-#include "k4LCIOConverter.h"
+#include "k4LCIOReader/k4LCIOConverter.h"
 
 #include "podio/CollectionIDTable.h"
 #include "podio/GenericParameters.h"
