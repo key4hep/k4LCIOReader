@@ -10,7 +10,7 @@ gaudi_add_library(k4LCIOReader
                       EDM4HEP::edm4hep)
 
 target_include_directories(k4LCIOReader PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>/include
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 # - test
