@@ -7,8 +7,10 @@
 #include "edm4hep/TrackerHitCollection.h"
 #include "edm4hep/TrackCollection.h"
 #include "edm4hep/SimCalorimeterHitCollection.h"
+#include "edm4hep/CaloHitContributionCollection.h"
 #include "edm4hep/RawCalorimeterHitCollection.h"
 #include "edm4hep/CalorimeterHitCollection.h"
+#include "edm4hep/ParticleIDCollection.h"
 #include "edm4hep/ClusterCollection.h"
 #include "edm4hep/VertexCollection.h"
 #include "edm4hep/ReconstructedParticleCollection.h"
@@ -22,7 +24,10 @@ DECLARE_COMPONENT(LCIOInput)
 
 LCIOInput::LCIOInput(const std::string& name, ISvcLocator* svcLoc)
     : GaudiAlgorithm(name, svcLoc),
-      m_nEvents(0)
+      m_nEvents(0),
+      m_extParticleID(false),
+      m_extCaloHitContribution(false),
+      m_extVertex(false)
 {
     declareProperty("inputs", m_files = {}, "Names of the files to read");
     declareProperty("input", m_file = "", "Names of the file to read");
@@ -67,6 +72,7 @@ StatusCode LCIOInput::initialize()
         else if ( colType == "SimCalorimeterHit" ) {
             m_dataHandles[colName] =
                 new DataHandle<edm4hep::SimCalorimeterHitCollection>(colName, Gaudi::DataHandle::Writer, this);
+            m_extCaloHitContribution = true;
         }
         else if ( colType == "RawCalorimeterHit" ) {
             m_dataHandles[colName] =
@@ -79,10 +85,13 @@ StatusCode LCIOInput::initialize()
         else if ( colType == "Cluster" ) {
             m_dataHandles[colName] =
                 new DataHandle<edm4hep::ClusterCollection>(colName, Gaudi::DataHandle::Writer, this);
+            m_extParticleID = true;
         }
         else if ( colType == "ReconstructedParticle" ) {
             m_dataHandles[colName] =
                 new DataHandle<edm4hep::ReconstructedParticleCollection>(colName, Gaudi::DataHandle::Writer, this);
+            m_extParticleID = true;
+            m_extVertex = true;
         }
         else if ( colType == "MCRecoTrackerAssociation" ) {
             m_dataHandles[colName] =
@@ -100,13 +109,26 @@ StatusCode LCIOInput::initialize()
             m_dataHandles[colName] =
                 new DataHandle<edm4hep::VertexCollection>(colName, Gaudi::DataHandle::Writer, this);
         }
-        //TODO: more types if necessary, such as Vertex ?...
+        //TODO: more types if necessary? ...
         else {
             error() << "invalid collection type: " << colType << endmsg;
             return StatusCode::FAILURE;
         }
 
         colNames.push_back(colName);
+    }
+
+    if ( m_extParticleID ) {
+        m_dataHandles["ParticleID_EXT"] =
+            new DataHandle<edm4hep::ParticleIDCollection>("ParticleID_EXT", Gaudi::DataHandle::Writer, this);
+    }
+    if ( m_extCaloHitContribution ) {
+        m_dataHandles["CaloHitContribution_EXT"] =
+            new DataHandle<edm4hep::CaloHitContributionCollection>("CaloHitContribution_EXT", Gaudi::DataHandle::Writer, this);
+    }
+    if ( m_extVertex ) {
+        m_dataHandles["Vertex_EXT"] =
+            new DataHandle<edm4hep::VertexCollection>("Vertex_EXT", Gaudi::DataHandle::Writer, this);
     }
 
     m_lcioReader.openFiles(m_files);
@@ -170,13 +192,23 @@ StatusCode LCIOInput::execute()
             }
         }
 
+        if ( m_extParticleID ) {
+            registCollection<edm4hep::ParticleIDCollection>("ParticleID_EXT");
+        }
+        if ( m_extCaloHitContribution ) {
+            registCollection<edm4hep::CaloHitContributionCollection>("CaloHitContribution_EXT");
+        }
+        if ( m_extVertex ) {
+            registCollection<edm4hep::VertexCollection>("Vertex_EXT");
+        }
+
         ++m_nEvents;
     }
     else {
         info() << "reach end of input files" << endmsg;
         m_incidentSvc->fireIncident( Incident( name(), IncidentType::AbortEvent  )  );
         auto ep = serviceLocator()->as<IEventProcessor>();
-        ep->stopRun();
+        return ep->stopRun();
     }
 
     return StatusCode::SUCCESS;

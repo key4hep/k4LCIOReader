@@ -24,6 +24,7 @@
 #include "edm4hep/TrackerHitCollection.h"
 #include "edm4hep/TrackCollection.h"
 #include "edm4hep/SimCalorimeterHitCollection.h"
+#include "edm4hep/CaloHitContributionCollection.h"
 #include "edm4hep/RawCalorimeterHitCollection.h"
 #include "edm4hep/CalorimeterHitCollection.h"
 #include "edm4hep/ParticleIDCollection.h"
@@ -381,6 +382,14 @@ podio::CollectionBase *k4LCIOConverter::cnvSimCalorimeterHitCollection(EVENT::LC
             if (v.second->getTypeName() == "MCParticle") getCollection(v.first);
             });
 
+    // get the CaloHitContribution collection
+    if ( m_name2dest.find("CaloHitContribution_EXT") == m_name2dest.end() ) {
+        auto tmpCol = new edm4hep::CaloHitContributionCollection();
+        tmpCol->setID(m_table->add("CaloHitContribution_EXT"));
+        m_name2dest.insert(std::make_pair("CaloHitContribution_EXT", tmpCol));
+    }
+    auto caloHitContCol = dynamic_cast<edm4hep::CaloHitContributionCollection*>(m_name2dest["CaloHitContribution_EXT"]);
+
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
         EVENT::SimCalorimeterHit *rval = (EVENT::SimCalorimeterHit *)src->getElementAt(i);
@@ -392,11 +401,14 @@ podio::CollectionBase *k4LCIOConverter::cnvSimCalorimeterHitCollection(EVENT::LC
         lval.setEnergy(rval->getEnergy());
         lval.setPosition(rval->getPosition());
 
-        // the CaloHitContribution objects are untracked here... Any solution?
+        // set CaloHitContribution objects
         for (auto j = 0, total = rval->getNMCContributions(); j < total; ++j)
         {
-            edm4hep::CaloHitContribution tmpObj(
-                rval->getPDGCont(j), rval->getEnergyCont(j), rval->getTimeCont(j), rval->getStepPosition(j));
+            edm4hep::CaloHitContribution tmpObj = caloHitContCol->create();
+            tmpObj.setPDG(rval->getPDGCont(j));
+            tmpObj.setEnergy(rval->getEnergyCont(j));
+            tmpObj.setTime(rval->getTimeCont(j));
+            tmpObj.setStepPosition(rval->getStepPosition(j));
             auto particle =
                 getCorresponding<edm4hep::MCParticle, edm4hep::MCParticleCollection,
                                  EVENT::MCParticle>("MCParticle", rval->getParticleCont(j));
@@ -484,8 +496,16 @@ podio::CollectionBase *k4LCIOConverter::cnvClusterCollection(EVENT::LCCollection
 
     // get all collections that this collection depends on
     for_each(m_name2src.begin(), m_name2src.end(), [this](auto& v) {
-            if (v.second->getTypeName() == "ParticleID") getCollection(v.first);
+            if (v.second->getTypeName() == "CalorimeterHit") getCollection(v.first);
             });
+
+    // get the ParticleID collection
+    if ( m_name2dest.find("ParticleID_EXT") == m_name2dest.end() ) {
+        auto tmpCol = new edm4hep::ParticleIDCollection();
+        tmpCol->setID(m_table->add("ParticleID_EXT"));
+        m_name2dest.insert(std::make_pair("ParticleID_EXT", tmpCol));
+    }
+    auto particleIdCol = dynamic_cast<edm4hep::ParticleIDCollection*>(m_name2dest["ParticleID_EXT"]);
 
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
@@ -528,28 +548,20 @@ podio::CollectionBase *k4LCIOConverter::cnvClusterCollection(EVENT::LCCollection
             }
         }
 
-        // find/generate and set the associated ParticleIDs
+        // generate and set the associated ParticleIDs
         auto &rparIDs = rval->getParticleIDs();
         for (auto &robj : rparIDs)
         {
-            auto lobj =
-                getCorresponding<edm4hep::ParticleID, edm4hep::ParticleIDCollection,
-                                 EVENT::ParticleID>("ParticleID", robj);
-            if (lobj.isAvailable())
+            edm4hep::ParticleID tmpObj = particleIdCol->create();
+            tmpObj.setType( robj->getType() );
+            tmpObj.setPDG( robj->getPDG() );
+            tmpObj.setAlgorithmType( robj->getAlgorithmType() );
+            tmpObj.setLikelihood( robj->getLikelihood() );
+            for (auto v : robj->getParameters())
             {
-                lval.addToParticleIDs(lobj);
+                tmpObj.addToParameters(v);
             }
-            else
-            {
-                // the ParticleID objects are untracked here... Any solution?
-                edm4hep::ParticleID tmpObj(robj->getType(), robj->getPDG(), robj->getAlgorithmType(), robj->getLikelihood());
-                for (auto v : robj->getParameters())
-                {
-                    tmpObj.addToParameters(v);
-                }
-                lval.addToParticleIDs(tmpObj);
-            }
-            
+            lval.addToParticleIDs(tmpObj);
         }
 
         // fill the shape parameters
@@ -608,10 +620,6 @@ podio::CollectionBase *k4LCIOConverter::cnvReconstructedParticleCollection(EVENT
 
     // get all collections that this collection depends on
     for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
-        if (v.second->getTypeName() == "Vertex")
-            getCollection(v.first);
-    });
-    for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
         if (v.second->getTypeName() == "Cluster")
             getCollection(v.first);
     });
@@ -619,6 +627,20 @@ podio::CollectionBase *k4LCIOConverter::cnvReconstructedParticleCollection(EVENT
         if (v.second->getTypeName() == "Track")
             getCollection(v.first);
     });
+    // get the ParticleID collection
+    if ( m_name2dest.find("ParticleID_EXT") == m_name2dest.end() ) {
+        auto tmpCol = new edm4hep::ParticleIDCollection();
+        tmpCol->setID(m_table->add("ParticleID_EXT"));
+        m_name2dest.insert(std::make_pair("ParticleID_EXT", tmpCol));
+    }
+    auto particleIdCol = dynamic_cast<edm4hep::ParticleIDCollection*>(m_name2dest["ParticleID_EXT"]);
+    // get the Vertex collection
+    if ( m_name2dest.find("Vertex_EXT") == m_name2dest.end() ) {
+        auto tmpCol = new edm4hep::VertexCollection();
+        tmpCol->setID(m_table->add("Vertex_EXT"));
+        m_name2dest.insert(std::make_pair("Vertex_EXT", tmpCol));
+    }
+    auto vertexCol = dynamic_cast<edm4hep::VertexCollection*>(m_name2dest["Vertex_EXT"]);
 
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
@@ -635,30 +657,21 @@ podio::CollectionBase *k4LCIOConverter::cnvReconstructedParticleCollection(EVENT
         lval.setReferencePoint(rval->getReferencePoint());
         lval.setType(rval->getType());
 
-        // find/generate and set the associated start vertex
+        // generate and set the associated start vertex
         auto rvtx = rval->getStartVertex();
-        auto lvtx =
-            getCorresponding<edm4hep::Vertex, edm4hep::VertexCollection,
-                             EVENT::Vertex>("Vertex", rvtx);
-        if (lvtx.isAvailable())
-        {
-            lvtx.setAssociatedParticle(lval);
-            lval.setStartVertex(lvtx);
-        }
-        else
-        {
-            // the Vertex objects are untracked here... Any solution?
-            auto &m = rval->getCovMatrix(); //6 parameters
+        if ( rvtx ) {
+            auto &vm = rval->getCovMatrix(); //6 parameters
             int algType = 0;  //FIXME: in LCIO this is a string
-            edm4hep::Vertex tmpObj(
-                rvtx->isPrimary() ? 1 : 0, rvtx->getChi2(), rvtx->getProbability(), rvtx->getPosition(),
-                {m[0], m[1], m[2], m[3], m[4], m[5]}, algType);
-            tmpObj.setAssociatedParticle(lval);
+            edm4hep::Vertex startVtx(
+                    rvtx->isPrimary() ? 1 : 0, rvtx->getChi2(), rvtx->getProbability(), rvtx->getPosition(),
+                    {vm[0], vm[1], vm[2], vm[3], vm[4], vm[5]}, algType);
+            startVtx.setAssociatedParticle(lval);
             for (auto v : rvtx->getParameters())
             {
-                tmpObj.addToParameters(v);
+                startVtx.addToParameters(v);
             }
-            lval.setStartVertex(tmpObj);
+            lval.setStartVertex(startVtx);
+            vertexCol->push_back(startVtx);
         }
 
         // find and set the associated clusters
@@ -700,33 +713,24 @@ podio::CollectionBase *k4LCIOConverter::cnvReconstructedParticleCollection(EVENT
             }
         }
 
-        // find/generate and set the associated ParticleIDs and ParticleIDUsed
+        // generate and set the associated ParticleIDs and ParticleIDUsed
         auto rparIDUsed = rval->getParticleIDUsed();
         auto &rparIDs = rval->getParticleIDs();
         for (auto &robj : rparIDs)
         {
-            auto lobj =
-                getCorresponding<edm4hep::ParticleID, edm4hep::ParticleIDCollection,
-                                 EVENT::ParticleID>("ParticleID", robj);
-            if (lobj.isAvailable())
+            //edm4hep::ParticleID tmpObj(robj->getType(), robj->getPDG(), robj->getAlgorithmType(), robj->getLikelihood());
+            edm4hep::ParticleID tmpObj = particleIdCol->create();
+            tmpObj.setType( robj->getType() );
+            tmpObj.setPDG( robj->getPDG() );
+            tmpObj.setAlgorithmType( robj->getAlgorithmType() );
+            tmpObj.setLikelihood( robj->getLikelihood() );
+            for (auto v : robj->getParameters())
             {
-                lval.addToParticleIDs(lobj);
-                if (rparIDUsed == robj) {
-                    lval.setParticleIDUsed(lobj);
-                }
+                tmpObj.addToParameters(v);
             }
-            else
-            {
-                // the ParticleID objects are untracked here... Any solution?
-                edm4hep::ParticleID tmpObj(robj->getType(), robj->getPDG(), robj->getAlgorithmType(), robj->getLikelihood());
-                for (auto v : robj->getParameters())
-                {
-                    tmpObj.addToParameters(v);
-                }
-                lval.addToParticleIDs(tmpObj);
-                if (rparIDUsed == robj) {
-                    lval.setParticleIDUsed(tmpObj);
-                }
+            lval.addToParticleIDs(tmpObj);
+            if (rparIDUsed == robj) {
+                lval.setParticleIDUsed(tmpObj);
             }
         }
     }
