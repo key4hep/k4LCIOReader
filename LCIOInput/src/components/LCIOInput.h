@@ -28,6 +28,10 @@ class LCIOInput : public GaudiAlgorithm {
 
     int m_nEvents;
 
+    bool m_extParticleID;
+    bool m_extCaloHitContribution;
+    bool m_extVertex;
+
     std::vector<std::pair<std::string, std::string>> m_collections;
 
     //input file(s)

@@ -74,7 +74,7 @@ edm4hep_t k4LCIOConverter::getCorresponding(const std::string &type, LCIO_t *rob
             }
         }
     }
-    return edm4hep_t();
+    return nullptr;  //crash the application if the corresponding obj is not found
 }
 
 #endif
