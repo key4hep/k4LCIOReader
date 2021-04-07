@@ -10,7 +10,7 @@
 int main()
 {
     auto reader = k4LCIOReader();
-    reader.open( "lciodata.slcio" );
+    reader.openFile( "lciodata.slcio" );
 
     auto store = podio::EventStore();
     store.setReader(&reader);
@@ -56,7 +56,7 @@ int main()
         //break;
     }
 
-    reader.close();
+    reader.closeFile();
 
     return 0;
 }
