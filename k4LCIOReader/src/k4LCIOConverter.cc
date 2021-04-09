@@ -329,19 +329,6 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackCollection(EVENT::LCCollection *
             }
         }
 
-        // find and set the associated tracks
-        auto &rtrks = rval->getTracks();
-        for (auto &robj : rtrks)
-        {
-            auto lobj =
-                getCorresponding<edm4hep::Track, edm4hep::TrackCollection,
-                                 EVENT::Track>("Track", robj);
-            if (lobj.isAvailable())
-            {
-                lval.addToTracks(lobj);
-            }
-        }
-
         // add Sub-detector numbers
         for (auto v : rval->getSubdetectorHitNumbers())
         {
@@ -367,6 +354,22 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackCollection(EVENT::LCCollection *
                 robj->getTanLambda(),
                 robj->getReferencePoint(),
                 _covMatrix});
+        }
+    }
+
+    for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
+    {
+        // find and set the associated tracks
+        for (auto &robj : ((EVENT::Track *)src->getElementAt(i))->getTracks())
+        {
+            int idx = getIndexOf(robj, src);
+            auto lobj = idx < 0
+                ? getCorresponding<edm4hep::Track, edm4hep::TrackCollection, EVENT::Track>("Track", robj)
+                : dest->at(idx);
+            if (lobj.isAvailable())
+            {
+                dest->at(i).addToTracks(lobj);
+            }
         }
     }
 
@@ -522,19 +525,6 @@ podio::CollectionBase *k4LCIOConverter::cnvClusterCollection(EVENT::LCCollection
         lval.setType(rval->getType());
         lval.setDirectionError(Vector3fFrom(rval->getDirectionError()));
 
-        // find and set the associated clusters
-        auto &rclusters = rval->getClusters();
-        for (auto &robj : rclusters)
-        {
-            auto lobj =
-                getCorresponding<edm4hep::Cluster, edm4hep::ClusterCollection,
-                                 EVENT::Cluster>("Cluster", robj);
-            if (lobj.isAvailable())
-            {
-                lval.addToClusters(lobj);
-            }
-        }
-
         // find and set the associated CalorimeterHits
         auto &rhits = rval->getCalorimeterHits();
         for (auto &robj : rhits)
@@ -580,6 +570,22 @@ podio::CollectionBase *k4LCIOConverter::cnvClusterCollection(EVENT::LCCollection
         for (auto v : rval->getSubdetectorEnergies())
         {
             lval.addToSubdetectorEnergies(v);
+        }
+    }
+
+    for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
+    {
+        // find and set the associated clusters
+        for (auto &robj : ((EVENT::Cluster *)src->getElementAt(i))->getClusters())
+        {
+            int idx = getIndexOf(robj, src);
+            auto lobj = idx < 0
+                ? getCorresponding<edm4hep::Cluster, edm4hep::ClusterCollection, EVENT::Cluster>("Cluster", robj)
+                : dest->at(idx);
+            if (lobj.isAvailable())
+            {
+                dest->at(i).addToClusters(lobj);
+            }
         }
     }
 
@@ -700,19 +706,6 @@ podio::CollectionBase *k4LCIOConverter::cnvReconstructedParticleCollection(EVENT
             }
         }
 
-        // find and set the associated particles
-        auto &rparticles = rval->getParticles();
-        for (auto &robj : rparticles)
-        {
-            auto lobj =
-                getCorresponding<edm4hep::ReconstructedParticle, edm4hep::ReconstructedParticleCollection,
-                                 EVENT::ReconstructedParticle>("ReconstructedParticle", robj);
-            if (lobj.isAvailable())
-            {
-                lval.addToParticles(lobj);
-            }
-        }
-
         // generate and set the associated ParticleIDs and ParticleIDUsed
         auto rparIDUsed = rval->getParticleIDUsed();
         auto &rparIDs = rval->getParticleIDs();
@@ -731,6 +724,23 @@ podio::CollectionBase *k4LCIOConverter::cnvReconstructedParticleCollection(EVENT
             lval.addToParticleIDs(tmpObj);
             if (rparIDUsed == robj) {
                 lval.setParticleIDUsed(tmpObj);
+            }
+        }
+    }
+
+    for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
+    {
+        // find and set the associated particles
+        for (auto &robj : ((EVENT::ReconstructedParticle *)src->getElementAt(i))->getParticles())
+        {
+            int idx = getIndexOf(robj, src);
+            auto lobj = idx < 0
+                ? getCorresponding<edm4hep::ReconstructedParticle, edm4hep::ReconstructedParticleCollection,
+                                 EVENT::ReconstructedParticle>("ReconstructedParticle", robj)
+                : dest->at(idx);
+            if (lobj.isAvailable())
+            {
+                dest->at(i).addToParticles(lobj);
             }
         }
     }
@@ -871,4 +881,16 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
     }
 
     return result;
+}
+
+int k4LCIOConverter::getIndexOf(EVENT::LCObject *lcObj, EVENT::LCCollection *lcCol)
+{
+    for (unsigned i = 0, M = lcCol->getNumberOfElements(); i < M; ++i)
+    {
+        if (lcObj == lcCol->getElementAt(i))
+        {
+            return i;
+        }
+    }
+    return -1;
 }

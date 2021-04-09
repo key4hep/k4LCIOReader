@@ -37,6 +37,9 @@ private:
     podio::CollectionBase *cnvReconstructedParticleCollection(EVENT::LCCollection *src);
     podio::CollectionBase *cnvAssociationCollection(EVENT::LCCollection *src);
 
+    // get the index of a LCIO object in a LCCollection, return -1 if not found
+    int getIndexOf(EVENT::LCObject *lcObj, EVENT::LCCollection *lcCol);
+
     // get the edm4hep object that corresponding to a LCIO object
     template <typename edm4hep_t,typename edm4hep_col_t, typename LCIO_t>
     edm4hep_t getCorresponding(const std::string &type, LCIO_t *rvar);
@@ -64,14 +67,11 @@ edm4hep_t k4LCIOConverter::getCorresponding(const std::string &type, LCIO_t *rob
     // loop all collections in the same type
     for (auto &colpair : m_type2cols[type])
     {
-        auto rcol = colpair.first;
-        for (unsigned j = 0, M = rcol->getNumberOfElements(); j < M; ++j)
+        int idx = getIndexOf(robj, colpair.first);
+        if (idx >= 0)
         {
-            if (robj == rcol->getElementAt(j))
-            {
-                auto lcol = dynamic_cast<edm4hep_col_t *>(colpair.second);
-                return lcol->at(j);
-            }
+            auto lcol = dynamic_cast<edm4hep_col_t *>(colpair.second);
+            return lcol->at(idx);
         }
     }
     return nullptr;  //crash the application if the corresponding obj is not found
