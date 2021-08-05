@@ -42,6 +42,7 @@ k4LCIOConverter::k4LCIOConverter(podio::CollectionIDTable *table)
     m_cnv["SimTrackerHit"] = &k4LCIOConverter::cnvSimTrackerHitCollection;
     m_cnv["TPCHit"] = &k4LCIOConverter::cnvTPCHitCollection;
     m_cnv["TrackerHit"] = &k4LCIOConverter::cnvTrackerHitCollection;
+    m_cnv["TrackerHitPlane"] = &k4LCIOConverter::cnvTrackerHitCollection;
     m_cnv["Track"] = &k4LCIOConverter::cnvTrackCollection;
     m_cnv["SimCalorimeterHit"] = &k4LCIOConverter::cnvSimCalorimeterHitCollection;
     m_cnv["RawCalorimeterHit"] = &k4LCIOConverter::cnvRawCalorimeterHitCollection;
@@ -114,7 +115,14 @@ podio::CollectionBase *k4LCIOConverter::getCollection(const std::string &name)
 
     // put result in data holders
     m_name2dest[name] = dest;
-    m_type2cols[src->getTypeName()].push_back(std::make_pair(src, dest));
+
+    // Exception to deal with TrackerHitPlane
+    // Force it to be a TrackerHit (Inherits from it)
+    if (src->getTypeName() == "TrackerHitPlane") {
+        m_type2cols["TrackerHit"].push_back(std::make_pair(src, dest));
+    } else  {
+        m_type2cols[src->getTypeName()].push_back(std::make_pair(src, dest));
+    }
 
     return dest;
 }
