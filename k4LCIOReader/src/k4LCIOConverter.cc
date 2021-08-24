@@ -37,6 +37,7 @@
 #include "edm4hep/MCRecoCaloAssociationCollection.h"
 #include "edm4hep/MCRecoParticleAssociationCollection.h"
 #include "edm4hep/MCRecoCaloParticleAssociationCollection.h"
+#include "edm4hep/MCRecoTrackerHitPlaneAssociationCollection.h"
 
 k4LCIOConverter::k4LCIOConverter(podio::CollectionIDTable *table)
     : m_table(table)
@@ -888,6 +889,44 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
             auto lTo =
                 getCorresponding<edm4hep::SimCalorimeterHit, edm4hep::SimCalorimeterHitCollection,
                                  EVENT::SimCalorimeterHit>("SimCalorimeterHit", rTo);
+            lval.setSim(lTo);
+
+            lval.setWeight(rval->getWeight());
+        }
+
+        result = dest;
+    }
+    else if ( fromType == "TrackerHitPlane" && toType == "SimTrackerHit" ) {
+        // get all collections that this collection depends on
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "TrackerHitPlane")
+                getCollection(v.first);
+        });
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "SimTrackerHit")
+                getCollection(v.first);
+        });
+
+        auto dest = new edm4hep::MCRecoTrackerHitPlaneAssociationCollection();
+
+        // here is the concrete convertions
+        for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
+        {
+            auto rval = (EVENT::LCRelation *)src->getElementAt(i);
+            if((EVENT::TrackerHitPlane *)rval->getFrom()==0 || (EVENT::SimTrackerHit *)rval->getTo()==0) continue;//remove 0
+            edm4hep::MCRecoTrackerHitPlaneAssociation lval = dest->create();
+
+            // find and set the associated data objects
+            auto rFrom = (EVENT::TrackerHitPlane *)rval->getFrom();
+            auto lFrom =
+                getCorresponding<edm4hep::TrackerHitPlane, edm4hep::TrackerHitPlaneCollection,
+                                 EVENT::TrackerHitPlane>("TrackerHitPlane", rFrom);
+            lval.setRec(lFrom);
+
+            auto rTo = (EVENT::SimTrackerHit *)rval->getTo();
+            auto lTo =
+                getCorresponding<edm4hep::SimTrackerHit, edm4hep::SimTrackerHitCollection,
+                                 EVENT::SimTrackerHit>("SimTrackerHit", rTo);
             lval.setSim(lTo);
 
             lval.setWeight(rval->getWeight());
