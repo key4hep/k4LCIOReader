@@ -38,6 +38,7 @@
 #include "edm4hep/MCRecoParticleAssociationCollection.h"
 #include "edm4hep/MCRecoCaloParticleAssociationCollection.h"
 #include "edm4hep/MCRecoTrackerHitPlaneAssociationCollection.h"
+#include "edm4hep/MCRecoClusterParticleAssociationCollection.h"
 
 k4LCIOConverter::k4LCIOConverter(podio::CollectionIDTable *table)
     : m_table(table)
@@ -927,6 +928,44 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
             auto lTo =
                 getCorresponding<edm4hep::SimTrackerHit, edm4hep::SimTrackerHitCollection,
                                  EVENT::SimTrackerHit>("SimTrackerHit", rTo);
+            lval.setSim(lTo);
+
+            lval.setWeight(rval->getWeight());
+        }
+
+        result = dest;
+    }
+    else if ( fromType == "Cluster" && toType == "MCParticle" ) {
+        // get all collections that this collection depends on
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "Cluster")
+                getCollection(v.first);
+        });
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "MCParticle")
+                getCollection(v.first);
+        });
+
+        auto dest = new edm4hep::MCRecoClusterParticleAssociationCollection();
+
+        // here is the concrete convertions
+        for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
+        {
+            auto rval = (EVENT::LCRelation *)src->getElementAt(i);
+            if((EVENT::Cluster *)rval->getFrom()==0 || (EVENT::MCParticle *)rval->getTo()==0) continue;//remove 0
+            edm4hep::MCRecoClusterParticleAssociation lval = dest->create();
+
+            // find and set the associated data objects
+            auto rFrom = (EVENT::Cluster *)rval->getFrom();
+            auto lFrom =
+                getCorresponding<edm4hep::Cluster, edm4hep::ClusterCollection,
+                                 EVENT::Cluster>("Cluster", rFrom);
+            lval.setRec(lFrom);
+
+            auto rTo = (EVENT::MCParticle *)rval->getTo();
+            auto lTo =
+                getCorresponding<edm4hep::MCParticle, edm4hep::MCParticleCollection,
+                                 EVENT::MCParticle>("MCParticle", rTo);
             lval.setSim(lTo);
 
             lval.setWeight(rval->getWeight());
