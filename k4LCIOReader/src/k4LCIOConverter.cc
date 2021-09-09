@@ -5,6 +5,7 @@
 #include "EVENT/SimTrackerHit.h"
 #include "EVENT/TPCHit.h"
 #include "EVENT/TrackerHit.h"
+#include "EVENT/TrackerHitPlane.h"
 #include "EVENT/Track.h"
 #include "EVENT/SimCalorimeterHit.h"
 #include "EVENT/RawCalorimeterHit.h"
@@ -22,6 +23,7 @@
 #include "edm4hep/SimTrackerHitCollection.h"
 #include "edm4hep/TPCHitCollection.h"
 #include "edm4hep/TrackerHitCollection.h"
+#include "edm4hep/TrackerHitPlaneCollection.h"
 #include "edm4hep/TrackCollection.h"
 #include "edm4hep/SimCalorimeterHitCollection.h"
 #include "edm4hep/CaloHitContributionCollection.h"
@@ -34,6 +36,10 @@
 #include "edm4hep/MCRecoTrackerAssociationCollection.h"
 #include "edm4hep/MCRecoCaloAssociationCollection.h"
 #include "edm4hep/MCRecoParticleAssociationCollection.h"
+#include "edm4hep/MCRecoCaloParticleAssociationCollection.h"
+#include "edm4hep/MCRecoTrackerHitPlaneAssociationCollection.h"
+#include "edm4hep/MCRecoClusterParticleAssociationCollection.h"
+#include "edm4hep/MCRecoTrackParticleAssociationCollection.h"
 
 k4LCIOConverter::k4LCIOConverter(podio::CollectionIDTable *table)
     : m_table(table)
@@ -42,6 +48,7 @@ k4LCIOConverter::k4LCIOConverter(podio::CollectionIDTable *table)
     m_cnv["SimTrackerHit"] = &k4LCIOConverter::cnvSimTrackerHitCollection;
     m_cnv["TPCHit"] = &k4LCIOConverter::cnvTPCHitCollection;
     m_cnv["TrackerHit"] = &k4LCIOConverter::cnvTrackerHitCollection;
+    m_cnv["TrackerHitPlane"] = &k4LCIOConverter::cnvTrackerHitPlaneCollection;
     m_cnv["Track"] = &k4LCIOConverter::cnvTrackCollection;
     m_cnv["SimCalorimeterHit"] = &k4LCIOConverter::cnvSimCalorimeterHitCollection;
     m_cnv["RawCalorimeterHit"] = &k4LCIOConverter::cnvRawCalorimeterHitCollection;
@@ -114,6 +121,7 @@ podio::CollectionBase *k4LCIOConverter::getCollection(const std::string &name)
 
     // put result in data holders
     m_name2dest[name] = dest;
+
     m_type2cols[src->getTypeName()].push_back(std::make_pair(src, dest));
 
     return dest;
@@ -293,6 +301,59 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackerHitCollection(EVENT::LCCollect
 
     return dest;
 }
+
+
+podio::CollectionBase *k4LCIOConverter::cnvTrackerHitPlaneCollection(EVENT::LCCollection *src)
+{
+    auto dest = new edm4hep::TrackerHitPlaneCollection();
+
+    // get all collections that this collection depends on
+    for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+        if (v.second->getTypeName() == "TPCHit")
+            getCollection(v.first);
+    });
+
+    // fill the collection
+    for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
+    {
+        EVENT::TrackerHitPlane *rval = (EVENT::TrackerHitPlane *)src->getElementAt(i);
+        edm4hep::TrackerHitPlane lval = dest->create();
+
+        unsigned long long cellID = rval->getCellID1();
+        cellID = (cellID << 32) | rval->getCellID0();
+        lval.setCellID(cellID);
+        lval.setType(rval->getType());
+        lval.setQuality(rval->getQuality());
+        lval.setTime(rval->getTime());
+        lval.setEDep(rval->getEDep());
+        lval.setEDepError(rval->getEDepError());
+        lval.setEdx(rval->getdEdx());
+        lval.setPosition(rval->getPosition());
+        lval.setU({rval->getU()[0], rval->getU()[1]});
+        lval.setV({rval->getV()[0], rval->getV()[1]});
+        lval.setDu(rval->getdU());
+        lval.setDv(rval->getdV());
+        auto &m = rval->getCovMatrix();
+        lval.setCovMatrix({m[0], m[1], m[2], m[3], m[4], m[5]});
+
+        // find and set the associated RawHit ( only TPCHit is considered now )
+        auto &robjvec = rval->getRawHits();
+        for (auto &robj : robjvec)
+        {
+            auto lobj =
+                getCorresponding<edm4hep::TPCHit, edm4hep::TPCHitCollection,
+                                 EVENT::LCObject>("TPCHit", robj);
+            if (lobj.isAvailable())
+            {
+                lval.addToRawHits(lobj.getObjectID());
+            }
+        }
+    }
+
+    return dest;
+}
+
+
 
 podio::CollectionBase *k4LCIOConverter::cnvTrackCollection(EVENT::LCCollection *src)
 {
@@ -837,6 +898,120 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
 
         result = dest;
     }
+    else if ( fromType == "TrackerHitPlane" && toType == "SimTrackerHit" ) {
+        // get all collections that this collection depends on
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "TrackerHitPlane")
+                getCollection(v.first);
+        });
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "SimTrackerHit")
+                getCollection(v.first);
+        });
+
+        auto dest = new edm4hep::MCRecoTrackerHitPlaneAssociationCollection();
+
+        // here is the concrete convertions
+        for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
+        {
+            auto rval = (EVENT::LCRelation *)src->getElementAt(i);
+            if((EVENT::TrackerHitPlane *)rval->getFrom()==0 || (EVENT::SimTrackerHit *)rval->getTo()==0) continue;//remove 0
+            edm4hep::MCRecoTrackerHitPlaneAssociation lval = dest->create();
+
+            // find and set the associated data objects
+            auto rFrom = (EVENT::TrackerHitPlane *)rval->getFrom();
+            auto lFrom =
+                getCorresponding<edm4hep::TrackerHitPlane, edm4hep::TrackerHitPlaneCollection,
+                                 EVENT::TrackerHitPlane>("TrackerHitPlane", rFrom);
+            lval.setRec(lFrom);
+
+            auto rTo = (EVENT::SimTrackerHit *)rval->getTo();
+            auto lTo =
+                getCorresponding<edm4hep::SimTrackerHit, edm4hep::SimTrackerHitCollection,
+                                 EVENT::SimTrackerHit>("SimTrackerHit", rTo);
+            lval.setSim(lTo);
+
+            lval.setWeight(rval->getWeight());
+        }
+
+        result = dest;
+    }
+    else if ( fromType == "Cluster" && toType == "MCParticle" ) {
+        // get all collections that this collection depends on
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "Cluster")
+                getCollection(v.first);
+        });
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "MCParticle")
+                getCollection(v.first);
+        });
+
+        auto dest = new edm4hep::MCRecoClusterParticleAssociationCollection();
+
+        // here is the concrete convertions
+        for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
+        {
+            auto rval = (EVENT::LCRelation *)src->getElementAt(i);
+            if((EVENT::Cluster *)rval->getFrom()==0 || (EVENT::MCParticle *)rval->getTo()==0) continue;//remove 0
+            edm4hep::MCRecoClusterParticleAssociation lval = dest->create();
+
+            // find and set the associated data objects
+            auto rFrom = (EVENT::Cluster *)rval->getFrom();
+            auto lFrom =
+                getCorresponding<edm4hep::Cluster, edm4hep::ClusterCollection,
+                                 EVENT::Cluster>("Cluster", rFrom);
+            lval.setRec(lFrom);
+
+            auto rTo = (EVENT::MCParticle *)rval->getTo();
+            auto lTo =
+                getCorresponding<edm4hep::MCParticle, edm4hep::MCParticleCollection,
+                                 EVENT::MCParticle>("MCParticle", rTo);
+            lval.setSim(lTo);
+
+            lval.setWeight(rval->getWeight());
+        }
+
+        result = dest;
+    }
+    else if ( fromType == "Track" && toType == "MCParticle" ) {
+        // get all collections that this collection depends on
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "Track")
+                getCollection(v.first);
+        });
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "MCParticle")
+                getCollection(v.first);
+        });
+
+        auto dest = new edm4hep::MCRecoTrackParticleAssociationCollection();
+
+        // here is the concrete convertions
+        for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
+        {
+            auto rval = (EVENT::LCRelation *)src->getElementAt(i);
+            if((EVENT::Track *)rval->getFrom()==0 || (EVENT::MCParticle *)rval->getTo()==0) continue;//remove 0
+            edm4hep::MCRecoTrackParticleAssociation lval = dest->create();
+
+            // find and set the associated data objects
+            auto rFrom = (EVENT::Track *)rval->getFrom();
+            auto lFrom =
+                getCorresponding<edm4hep::Track, edm4hep::TrackCollection,
+                                 EVENT::Track>("Track", rFrom);
+            lval.setRec(lFrom);
+
+            auto rTo = (EVENT::MCParticle *)rval->getTo();
+            auto lTo =
+                getCorresponding<edm4hep::MCParticle, edm4hep::MCParticleCollection,
+                                 EVENT::MCParticle>("MCParticle", rTo);
+            lval.setSim(lTo);
+
+            lval.setWeight(rval->getWeight());
+        }
+
+        result = dest;
+    }
     else if ( fromType == "TrackerHit" && toType == "SimTrackerHit" ) {
         // get all collections that this collection depends on
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
@@ -875,8 +1050,46 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
 
         result = dest;
     }
+    else if ( fromType == "CalorimeterHit" && toType == "MCParticle" ) {
+        // get all collections that this collection depends on
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "CalorimeterHit")
+                getCollection(v.first);
+        });
+        for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
+            if (v.second->getTypeName() == "MCParticle")
+                getCollection(v.first);
+        });
+
+        auto dest = new edm4hep::MCRecoCaloParticleAssociationCollection();
+
+        // here are the concrete conversions
+        for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
+        {
+            auto rval = (EVENT::LCRelation *)src->getElementAt(i);
+            if((EVENT::CalorimeterHit *)rval->getFrom()==0 || (EVENT::MCParticle *)rval->getTo()==0) continue;//remove 0
+            edm4hep::MCRecoCaloParticleAssociation lval = dest->create();
+
+            // find and set the associated data objects
+            auto rFrom = (EVENT::CalorimeterHit *)rval->getFrom();
+            auto lFrom =
+                getCorresponding<edm4hep::CalorimeterHit, edm4hep::CalorimeterHitCollection,
+                                 EVENT::CalorimeterHit>("CalorimeterHit", rFrom);
+            lval.setRec(lFrom);
+
+            auto rTo = (EVENT::MCParticle *)rval->getTo();
+            auto lTo =
+                getCorresponding<edm4hep::MCParticle, edm4hep::MCParticleCollection,
+                                 EVENT::MCParticle>("MCParticle", rTo);
+            lval.setSim(lTo);
+
+            lval.setWeight(rval->getWeight());
+        }
+
+        result = dest;
+    }
     else {
-        std::cout<<"Error, Don't find correct fromType="<<fromType<<" or toType="<<toType<<", stop here."<<std::endl; 
+        std::cout<<"Error: could not find correct fromType="<<fromType<<" or toType="<<toType<<", stop here."<<std::endl; 
         throw;
     }
 

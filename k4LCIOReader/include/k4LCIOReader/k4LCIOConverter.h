@@ -27,6 +27,7 @@ private:
     podio::CollectionBase *cnvSimTrackerHitCollection(EVENT::LCCollection *src);
     podio::CollectionBase *cnvTPCHitCollection(EVENT::LCCollection *src);
     podio::CollectionBase *cnvTrackerHitCollection(EVENT::LCCollection *src);
+    podio::CollectionBase *cnvTrackerHitPlaneCollection(EVENT::LCCollection *src);
     podio::CollectionBase *cnvTrackCollection(EVENT::LCCollection *src);
     podio::CollectionBase *cnvSimCalorimeterHitCollection(EVENT::LCCollection *src);
     podio::CollectionBase *cnvRawCalorimeterHitCollection(EVENT::LCCollection *src);
