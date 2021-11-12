@@ -811,10 +811,6 @@ podio::CollectionBase *k4LCIOConverter::cnvReconstructedParticleCollection(EVENT
 
 podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollection *src)
 {
-    unsigned nTotal = src->getNumberOfElements();
-    if (nTotal == 0) {
-        return nullptr;
-    }
 
     podio::CollectionBase* result = nullptr;
 
