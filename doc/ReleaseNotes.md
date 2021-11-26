@@ -1,3 +1,13 @@
+# v00.04.00
+
+* 2021-11-12 Placido Fernandez Declara ([PR#13](https://github.com/key4hep/k4LCIOReader/pull/13))
+  - Remove `nullptr` return on `cnvAssociationCollection()` when there are no elements.
+  - If no collections are found, it will return an empty `edm4hep::<something>AssociationCollection`.
+
+* 2021-09-09 Placido Fernandez Declara ([PR#12](https://github.com/key4hep/k4LCIOReader/pull/12))
+  - Adds support for TrackerHitPlane and extra associations
+  - Needs EDM4hep: https://github.com/key4hep/EDM4hep/pull/122
+
 # v00.03.02
 
 * 2021-04-09 Placido Fernandez Declara ([PR#11](https://github.com/key4hep/k4LCIOReader/pull/11))
