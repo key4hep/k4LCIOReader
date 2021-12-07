@@ -141,7 +141,7 @@ podio::CollectionBase *k4LCIOConverter::cnvEventHeader()
 {
     auto dest = new edm4hep::EventHeaderCollection();
 
-    edm4hep::EventHeader lval = dest->create();
+    auto lval = dest->create();
     lval.setEventNumber(m_evt->getEventNumber());
     lval.setRunNumber(m_evt->getRunNumber());
     lval.setTimeStamp(m_evt->getTimeStamp());
@@ -157,7 +157,7 @@ podio::CollectionBase *k4LCIOConverter::cnvMCParticleCollection(EVENT::LCCollect
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
         EVENT::MCParticle *rval = (EVENT::MCParticle *)src->getElementAt(i);
-        edm4hep::MCParticle lval = dest->create();
+        auto lval = dest->create();
 
         lval.setPDG(rval->getPDG());
         lval.setGeneratorStatus(rval->getGeneratorStatus());
@@ -180,7 +180,7 @@ podio::CollectionBase *k4LCIOConverter::cnvMCParticleCollection(EVENT::LCCollect
                 if (src->getElementAt(k) == rparent)
                 {
                     // A loop for edm4hep's MCParticleCollection to recover the relationship
-                    edm4hep::MCParticle lparent = dest->at(k);
+                    auto lparent = dest->at(k);
                     lval.addToParents(lparent);
                     lparent.addToDaughters(lval);
                     break;
@@ -206,7 +206,7 @@ podio::CollectionBase *k4LCIOConverter::cnvSimTrackerHitCollection(EVENT::LCColl
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
         EVENT::SimTrackerHit *rval = (EVENT::SimTrackerHit *)src->getElementAt(i);
-        edm4hep::SimTrackerHit lval = dest->create();
+        auto lval = dest->create();
 
         unsigned long long cellID = rval->getCellID1();
         cellID = (cellID << 32) | rval->getCellID0();
@@ -241,7 +241,7 @@ podio::CollectionBase *k4LCIOConverter::cnvTPCHitCollection(EVENT::LCCollection 
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
         EVENT::TPCHit *rval = (EVENT::TPCHit *)src->getElementAt(i);
-        edm4hep::TPCHit lval = dest->create();
+        auto lval = dest->create();
 
         lval.setCellID(rval->getCellID());
         lval.setTime(rval->getTime());
@@ -270,7 +270,7 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackerHitCollection(EVENT::LCCollect
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
         EVENT::TrackerHit *rval = (EVENT::TrackerHit *)src->getElementAt(i);
-        edm4hep::TrackerHit lval = dest->create();
+        auto lval = dest->create();
 
         unsigned long long cellID = rval->getCellID1();
         cellID = (cellID << 32) | rval->getCellID0();
@@ -317,7 +317,7 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackerHitPlaneCollection(EVENT::LCCo
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
         EVENT::TrackerHitPlane *rval = (EVENT::TrackerHitPlane *)src->getElementAt(i);
-        edm4hep::TrackerHitPlane lval = dest->create();
+        auto lval = dest->create();
 
         unsigned long long cellID = rval->getCellID1();
         cellID = (cellID << 32) | rval->getCellID0();
@@ -368,7 +368,7 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackCollection(EVENT::LCCollection *
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
         EVENT::Track *rval = (EVENT::Track *)src->getElementAt(i);
-        edm4hep::Track lval = dest->create();
+        auto lval = dest->create();
 
         lval.setType(rval->getType());
         lval.setChi2(rval->getChi2());
@@ -457,7 +457,7 @@ podio::CollectionBase *k4LCIOConverter::cnvSimCalorimeterHitCollection(EVENT::LC
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
         EVENT::SimCalorimeterHit *rval = (EVENT::SimCalorimeterHit *)src->getElementAt(i);
-        edm4hep::SimCalorimeterHit lval = dest->create();
+        auto lval = dest->create();
 
         unsigned long long cellID = rval->getCellID1();
         cellID = (cellID << 32) | rval->getCellID0();
@@ -468,7 +468,7 @@ podio::CollectionBase *k4LCIOConverter::cnvSimCalorimeterHitCollection(EVENT::LC
         // set CaloHitContribution objects
         for (auto j = 0, total = rval->getNMCContributions(); j < total; ++j)
         {
-            edm4hep::CaloHitContribution tmpObj = caloHitContCol->create();
+            auto tmpObj = caloHitContCol->create();
             tmpObj.setPDG(rval->getPDGCont(j));
             tmpObj.setEnergy(rval->getEnergyCont(j));
             tmpObj.setTime(rval->getTimeCont(j));
@@ -495,7 +495,7 @@ podio::CollectionBase *k4LCIOConverter::cnvRawCalorimeterHitCollection(EVENT::LC
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
         EVENT::RawCalorimeterHit *rval = (EVENT::RawCalorimeterHit *)src->getElementAt(i);
-        edm4hep::RawCalorimeterHit lval = dest->create();
+        auto lval = dest->create();
 
         unsigned long long cellID = rval->getCellID1();
         cellID = (cellID << 32) | rval->getCellID0();
@@ -514,7 +514,7 @@ podio::CollectionBase *k4LCIOConverter::cnvCalorimeterHitCollection(EVENT::LCCol
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
         EVENT::CalorimeterHit *rval = (EVENT::CalorimeterHit *)src->getElementAt(i);
-        edm4hep::CalorimeterHit lval = dest->create();
+        auto lval = dest->create();
 
         unsigned long long cellID = rval->getCellID1();
         cellID = (cellID << 32) | rval->getCellID0();
@@ -538,7 +538,7 @@ podio::CollectionBase *k4LCIOConverter::cnvParticleIDCollection(EVENT::LCCollect
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
         EVENT::ParticleID *rval = (EVENT::ParticleID *)src->getElementAt(i);
-        edm4hep::ParticleID lval = dest->create();
+        auto lval = dest->create();
 
         lval.setType(rval->getType());
         lval.setPDG(rval->getPDG());
@@ -574,7 +574,7 @@ podio::CollectionBase *k4LCIOConverter::cnvClusterCollection(EVENT::LCCollection
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
         EVENT::Cluster *rval = (EVENT::Cluster *)src->getElementAt(i);
-        edm4hep::Cluster lval = dest->create();
+        auto lval = dest->create();
 
         lval.setEnergy(rval->getEnergy());
         lval.setEnergyError(rval->getEnergyError());
@@ -603,7 +603,7 @@ podio::CollectionBase *k4LCIOConverter::cnvClusterCollection(EVENT::LCCollection
         auto &rparIDs = rval->getParticleIDs();
         for (auto &robj : rparIDs)
         {
-            edm4hep::ParticleID tmpObj = particleIdCol->create();
+            auto tmpObj = particleIdCol->create();
             tmpObj.setType( robj->getType() );
             tmpObj.setPDG( robj->getPDG() );
             tmpObj.setAlgorithmType( robj->getAlgorithmType() );
@@ -660,7 +660,7 @@ podio::CollectionBase *k4LCIOConverter::cnvVertexCollection(EVENT::LCCollection 
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
         EVENT::Vertex *rval = (EVENT::Vertex *)src->getElementAt(i);
-        edm4hep::Vertex lval = dest->create();
+        auto lval = dest->create();
 
         lval.setPrimary(rval->isPrimary() ? 1 : 0);  //1 for primary and 0 for not primary
         lval.setChi2(rval->getChi2());
@@ -712,7 +712,7 @@ podio::CollectionBase *k4LCIOConverter::cnvReconstructedParticleCollection(EVENT
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
         EVENT::ReconstructedParticle *rval = (EVENT::ReconstructedParticle *)src->getElementAt(i);
-        edm4hep::ReconstructedParticle lval = dest->create();
+        auto lval = dest->create();
 
         lval.setCharge(rval->getCharge());
         auto &m = rval->getCovMatrix(); //10 parameters
@@ -729,7 +729,7 @@ podio::CollectionBase *k4LCIOConverter::cnvReconstructedParticleCollection(EVENT
         if ( rvtx ) {
             auto &vm = rval->getCovMatrix(); //6 parameters
             int algType = 0;  //FIXME: in LCIO this is a string
-            edm4hep::Vertex startVtx(
+            edm4hep::MutableVertex startVtx(
                     rvtx->isPrimary() ? 1 : 0, rvtx->getChi2(), rvtx->getProbability(), rvtx->getPosition(),
                     {vm[0], vm[1], vm[2], vm[3], vm[4], vm[5]}, algType);
             startVtx.setAssociatedParticle(lval);
@@ -773,7 +773,7 @@ podio::CollectionBase *k4LCIOConverter::cnvReconstructedParticleCollection(EVENT
         for (auto &robj : rparIDs)
         {
             //edm4hep::ParticleID tmpObj(robj->getType(), robj->getPDG(), robj->getAlgorithmType(), robj->getLikelihood());
-            edm4hep::ParticleID tmpObj = particleIdCol->create();
+            auto tmpObj = particleIdCol->create();
             tmpObj.setType( robj->getType() );
             tmpObj.setPDG( robj->getPDG() );
             tmpObj.setAlgorithmType( robj->getAlgorithmType() );
@@ -836,7 +836,7 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         {
             auto rval = (EVENT::LCRelation *)src->getElementAt(i);
             if((EVENT::ReconstructedParticle *)rval->getFrom()==0 || (EVENT::MCParticle *)rval->getTo()==0) continue;//remove 0
-            edm4hep::MCRecoParticleAssociation lval = dest->create();
+            auto lval = dest->create();
 
             // find and set the associated data objects
             auto rFrom = (EVENT::ReconstructedParticle *)rval->getFrom();
@@ -874,7 +874,7 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         {
             auto rval = (EVENT::LCRelation *)src->getElementAt(i);
             if((EVENT::CalorimeterHit *)rval->getFrom()==0 || (EVENT::SimCalorimeterHit *)rval->getTo()==0) continue;//remove 0
-            edm4hep::MCRecoCaloAssociation lval = dest->create();
+            auto lval = dest->create();
 
             // find and set the associated data objects
             auto rFrom = (EVENT::CalorimeterHit *)rval->getFrom();
@@ -912,7 +912,7 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         {
             auto rval = (EVENT::LCRelation *)src->getElementAt(i);
             if((EVENT::TrackerHitPlane *)rval->getFrom()==0 || (EVENT::SimTrackerHit *)rval->getTo()==0) continue;//remove 0
-            edm4hep::MCRecoTrackerHitPlaneAssociation lval = dest->create();
+            auto lval = dest->create();
 
             // find and set the associated data objects
             auto rFrom = (EVENT::TrackerHitPlane *)rval->getFrom();
@@ -950,7 +950,7 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         {
             auto rval = (EVENT::LCRelation *)src->getElementAt(i);
             if((EVENT::Cluster *)rval->getFrom()==0 || (EVENT::MCParticle *)rval->getTo()==0) continue;//remove 0
-            edm4hep::MCRecoClusterParticleAssociation lval = dest->create();
+            auto lval = dest->create();
 
             // find and set the associated data objects
             auto rFrom = (EVENT::Cluster *)rval->getFrom();
@@ -988,7 +988,7 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         {
             auto rval = (EVENT::LCRelation *)src->getElementAt(i);
             if((EVENT::Track *)rval->getFrom()==0 || (EVENT::MCParticle *)rval->getTo()==0) continue;//remove 0
-            edm4hep::MCRecoTrackParticleAssociation lval = dest->create();
+            auto lval = dest->create();
 
             // find and set the associated data objects
             auto rFrom = (EVENT::Track *)rval->getFrom();
@@ -1026,7 +1026,7 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         {
             auto rval = (EVENT::LCRelation *)src->getElementAt(i);
             if((EVENT::TrackerHit *)rval->getFrom()==0 || (EVENT::SimTrackerHit *)rval->getTo()==0) continue;//remove 0
-            edm4hep::MCRecoTrackerAssociation lval = dest->create();
+            auto lval = dest->create();
 
             // find and set the associated data objects
             auto rFrom = (EVENT::TrackerHit *)rval->getFrom();
@@ -1064,7 +1064,7 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         {
             auto rval = (EVENT::LCRelation *)src->getElementAt(i);
             if((EVENT::CalorimeterHit *)rval->getFrom()==0 || (EVENT::MCParticle *)rval->getTo()==0) continue;//remove 0
-            edm4hep::MCRecoCaloParticleAssociation lval = dest->create();
+            auto lval = dest->create();
 
             // find and set the associated data objects
             auto rFrom = (EVENT::CalorimeterHit *)rval->getFrom();
