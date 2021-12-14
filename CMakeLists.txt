@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.8)
 project(k4LCIOReader)
 
 option(BUILD_LCIOINPUT_IN_GAUDI "whether build the LCIOInput algorithm wrapper in Gaudi" ON)
-option(BUILD_TESTING "whether build the test(s)" OFF)
 
 find_package(ROOT COMPONENTS RIO Tree)
 
@@ -25,6 +24,8 @@ set(CMAKE_CXX_STANDARD 17 CACHE STRING "")
 if(NOT CMAKE_CXX_STANDARD MATCHES "14|17")
   message(FATAL_ERROR "Unsupported C++ standard: ${CMAKE_CXX_STANDARD}")
 endif()
+
+include (CTest)
 
 add_subdirectory(k4LCIOReader)
 add_subdirectory(LCIOInput)
