@@ -1089,7 +1089,7 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         // get all collections that this collection depends on
         for (auto& [name, coll] : m_name2src) {
           if ((coll->getTypeName() == fromType) ||
-              (coll->getTypeName() == toType) {
+              (coll->getTypeName() == toType)) {
                 getCollection(name);
           }
         }
@@ -1114,7 +1114,7 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
             auto lTo =
                 getCorresponding<edm4hep::Vertex, edm4hep::VertexCollection,
                                  EVENT::Vertex>("Vertex", rTo);
-            lval.setSim(lTo);
+            lval.setVertex(lTo);
 
             lval.setWeight(rval->getWeight());
         }
