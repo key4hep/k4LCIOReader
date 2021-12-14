@@ -40,6 +40,7 @@
 #include "edm4hep/MCRecoTrackerHitPlaneAssociationCollection.h"
 #include "edm4hep/MCRecoClusterParticleAssociationCollection.h"
 #include "edm4hep/MCRecoTrackParticleAssociationCollection.h"
+#include "edm4hep/RecoParticleVertexAssociationCollection.h"
 
 k4LCIOConverter::k4LCIOConverter(podio::CollectionIDTable *table)
     : m_table(table)
@@ -1078,6 +1079,42 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
                 getCorresponding<edm4hep::MCParticle, edm4hep::MCParticleCollection,
                                  EVENT::MCParticle>("MCParticle", rTo);
             lval.setSim(lTo);
+
+            lval.setWeight(rval->getWeight());
+        }
+
+        result = dest;
+    }
+    else if ( fromType == "ReconstructedParticle" && toType == "Vertex" ) {
+        // get all collections that this collection depends on
+        for (auto& [name, coll] : m_name2src) {
+          if ((coll->getTypeName() == fromType) ||
+              (coll->getTypeName() == toType)) {
+                getCollection(name);
+          }
+        }
+
+        auto dest = new edm4hep::RecoParticleVertexAssociationCollection();
+
+        // here is the concrete convertions
+        for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
+        {
+            auto rval = (EVENT::LCRelation *)src->getElementAt(i);
+            if((EVENT::ReconstructedParticle *)rval->getFrom()==0 || (EVENT::Vertex *)rval->getTo()==0) continue;//remove 0
+            edm4hep::RecoParticleVertexAssociation lval = dest->create();
+
+            // find and set the associated data objects
+            auto rFrom = (EVENT::ReconstructedParticle *)rval->getFrom();
+            auto lFrom =
+                getCorresponding<edm4hep::ReconstructedParticle, edm4hep::ReconstructedParticleCollection,
+                                 EVENT::ReconstructedParticle>("ReconstructedParticle", rFrom);
+            lval.setRec(lFrom);
+
+            auto rTo = (EVENT::Vertex *)rval->getTo();
+            auto lTo =
+                getCorresponding<edm4hep::Vertex, edm4hep::VertexCollection,
+                                 EVENT::Vertex>("Vertex", rTo);
+            lval.setVertex(lTo);
 
             lval.setWeight(rval->getWeight());
         }
