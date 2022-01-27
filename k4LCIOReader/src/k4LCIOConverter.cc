@@ -1101,7 +1101,7 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         {
             auto rval = (EVENT::LCRelation *)src->getElementAt(i);
             if((EVENT::ReconstructedParticle *)rval->getFrom()==0 || (EVENT::Vertex *)rval->getTo()==0) continue;//remove 0
-            edm4hep::RecoParticleVertexAssociation lval = dest->create();
+            edm4hep::MutableRecoParticleVertexAssociation lval = dest->create();
 
             // find and set the associated data objects
             auto rFrom = (EVENT::ReconstructedParticle *)rval->getFrom();
