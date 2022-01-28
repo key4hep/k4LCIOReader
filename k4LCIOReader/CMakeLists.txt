@@ -15,11 +15,11 @@ target_include_directories(k4LCIOReader PUBLIC
 
 # - test
 if(BUILD_TESTING)
-    add_executable(read_lcio test/read_lcio.cc)
-    target_include_directories(read_lcio PUBLIC
+    add_executable(k4lcioreader_read-lcio test/read-lcio.cc)
+    target_include_directories(k4lcioreader_read-lcio PUBLIC
         ${podio_INCLUDE_DIR})
-    target_link_libraries(read_lcio k4LCIOReader)
-    add_test(NAME read_lcio COMMAND read_lcio)
+    target_link_libraries(k4lcioreader_read-lcio k4LCIOReader)
+    add_test(NAME read-lcio COMMAND wget https://key4hep.web.cern.ch/key4hep/testFiles/ddsimOutput/testSimulation.slcio; k4lcioreader_read-lcio testSimulation.slcio)
 endif()
 
 install(TARGETS k4LCIOReader

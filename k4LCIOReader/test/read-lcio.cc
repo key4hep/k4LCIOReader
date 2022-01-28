@@ -7,10 +7,20 @@
 #include "edm4hep/MCRecoParticleAssociationCollection.h"
 #include "podio/EventStore.h"
 
-int main()
+int main(int argc, char *argv[])
 {
+    // simple command line parsing: get filename from first argument
+    std::string filename;
+    if (argc < 2) {
+      filename = "lciodata.slcio";
+      std::cout << "No filename given, defaulting to reading lciodata.slcio..." << std::endl;
+    } else {
+      filename = argv[1];
+      std::cout << "Reading file " << filename << "..." << std::endl;
+    }
+
     auto reader = k4LCIOReader();
-    reader.openFile( "lciodata.slcio" );
+    reader.openFile( filename );
 
     auto store = podio::EventStore();
     store.setReader(&reader);
