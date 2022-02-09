@@ -63,6 +63,8 @@ public:
     virtual std::map<int, podio::GenericParameters>* readRunMetaData();
     virtual void endOfEvent();
 
+    podio::version::Version currentFileVersion() const override { return m_fileVersion; }
+
 private:
     /// Implementation for collection reading
     podio::CollectionBase *readCollection(const std::string &name) override final;
@@ -78,6 +80,8 @@ private:
 
     ///...
     podio::CollectionIDTable *m_table;
+
+    podio::version::Version m_fileVersion{0, 0, 0};
 };
 
 template <typename T>
