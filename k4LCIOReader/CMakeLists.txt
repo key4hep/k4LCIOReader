@@ -20,8 +20,9 @@ if(BUILD_TESTING)
         ${podio_INCLUDE_DIR})
     target_link_libraries(k4lcioreader_read-lcio k4LCIOReader)
     add_test(NAME prepare-input-files COMMAND wget https://key4hep.web.cern.ch/key4hep/testFiles/ddsimOutput/testSimulation.slcio)
+    set_tests_properties(prepare-input-files PROPERTIES FIXTURES_SETUP external_test_files)
     add_test(NAME read-lcio COMMAND k4lcioreader_read-lcio testSimulation.slcio)
-    set_tests_properties(read-lcio PROPERTIES DEPENDS prepare-input-files)
+    set_tests_properties(read-lcio PROPERTIES FIXTURES_REQUIRED external_test_files)
 endif()
 
 install(TARGETS k4LCIOReader
