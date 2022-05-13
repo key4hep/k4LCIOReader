@@ -117,13 +117,18 @@ podio::CollectionBase *k4LCIOConverter::getCollection(const std::string &name)
     }
 
     // convert
-    podio::CollectionBase *dest = (this->*(it->second))(src);
-    dest->setID(m_table->add(name));
+    podio::CollectionBase* dest = nullptr;
+    try {
+      dest = (this->*(it->second))(src);
+      dest->setID(m_table->add(name));
 
-    // put result in data holders
-    m_name2dest[name] = dest;
+      // put result in data holders
+      m_name2dest[name] = dest;
 
-    m_type2cols[src->getTypeName()].push_back(std::make_pair(src, dest));
+      m_type2cols[src->getTypeName()].push_back(std::make_pair(src, dest));
+    } catch (std::runtime_error& re) {
+      std::cout << re.what() << std::endl;
+    }
 
     return dest;
 }
@@ -1122,8 +1127,8 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         result = dest;
     }
     else {
-        std::cout<<"Error: could not find correct fromType="<<fromType<<" or toType="<<toType<<", stop here."<<std::endl; 
-        throw;
+        throw std::runtime_error("Error: Could not find valid association fromType=<" + fromType +
+          "> or toType=<" + toType + "> for collection: " + src->getTypeName());
     }
 
     return result;
