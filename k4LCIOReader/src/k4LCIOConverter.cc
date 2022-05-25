@@ -625,12 +625,6 @@ podio::CollectionBase *k4LCIOConverter::cnvClusterCollection(EVENT::LCCollection
             lval.addToShapeParameters(v);
         }
 
-        // fill the hit contributions
-        for (auto v : rval->getHitContributions())
-        {
-            lval.addToHitContributions(v);
-        }
-
         // fill the Sub-detector energies
         for (auto v : rval->getSubdetectorEnergies())
         {
