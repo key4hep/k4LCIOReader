@@ -281,7 +281,6 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackerHitCollection(EVENT::LCCollect
         lval.setTime(rval->getTime());
         lval.setEDep(rval->getEDep());
         lval.setEDepError(rval->getEDepError());
-        lval.setEdx(rval->getdEdx());
         lval.setPosition(rval->getPosition());
         auto &m = rval->getCovMatrix();
         lval.setCovMatrix({m[0], m[1], m[2], m[3], m[4], m[5]});
@@ -328,7 +327,6 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackerHitPlaneCollection(EVENT::LCCo
         lval.setTime(rval->getTime());
         lval.setEDep(rval->getEDep());
         lval.setEDepError(rval->getEDepError());
-        lval.setEdx(rval->getdEdx());
         lval.setPosition(rval->getPosition());
         lval.setU({rval->getU()[0], rval->getU()[1]});
         lval.setV({rval->getV()[0], rval->getV()[1]});
