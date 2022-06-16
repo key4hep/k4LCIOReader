@@ -404,7 +404,7 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackCollection(EVENT::LCCollection *
         auto &rstates = rval->getTrackStates();
         for (auto &robj : rstates)
         {
-            std::array<float, 15> _covMatrix;
+            std::array<float, 21> _covMatrix{};
             const auto& rCM = robj->getCovMatrix();
             for (int i = 0; i < 15; ++i)
             {
@@ -417,6 +417,7 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackCollection(EVENT::LCCollection *
                 robj->getOmega(),
                 robj->getZ0(),
                 robj->getTanLambda(),
+                -1.f,
                 robj->getReferencePoint(),
                 _covMatrix});
         }
