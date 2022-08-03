@@ -1,3 +1,21 @@
+# v00.04.02
+
+* 2022-06-16 Thomas Madlener ([PR#25](https://github.com/key4hep/k4lcioreader/pull/25))
+  - Fix the TrackState conversion after `time` field has been added in key4hep/EDM4hep#138.
+    - For now filling a dummy value of `-1` and zeroing out the covariance matrix.
+
+* 2022-05-25 Valentin Volkl ([PR#24](https://github.com/key4hep/k4lcioreader/pull/24))
+  - remove HitContributions from Clusters as in  https://github.com/key4hep/EDM4hep/pull/140
+
+* 2022-05-25 Valentin Volkl ([PR#23](https://github.com/key4hep/k4lcioreader/pull/23))
+  - remove edx from TrackerHits as in https://github.com/key4hep/EDM4hep/pull/139
+
+* 2022-05-19 Placido Fernandez Declara ([PR#22](https://github.com/key4hep/k4lcioreader/pull/22))
+  - Handle possible nullptr on conversion that could lead to segfault
+
+* 2022-03-21 Valentin Volkl ([PR#21](https://github.com/key4hep/k4lcioreader/pull/21))
+  - tests: fix wget command
+
 # v00.04.01
 
 * 2022-02-10 Placido Fernandez Declara ([PR#20](https://github.com/key4hep/k4LCIOReader/pull/20))
