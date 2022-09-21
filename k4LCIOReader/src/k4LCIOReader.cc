@@ -12,8 +12,8 @@ k4LCIOReader::k4LCIOReader()
     : m_entries(0),
       m_reader(nullptr)
 {
-    m_table = new podio::CollectionIDTable();
-    m_converter = new k4LCIOConverter(m_table);
+    m_table = std::make_shared<podio::CollectionIDTable>();
+    m_converter = new k4LCIOConverter(m_table.get());
 }
 
 k4LCIOReader::~k4LCIOReader()
