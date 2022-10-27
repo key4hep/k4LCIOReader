@@ -1,3 +1,9 @@
+# v00.04.03
+
+* 2022-09-21 Thomas Madlener ([PR#27](https://github.com/key4hep/k4lcioreader/pull/27))
+  - Make the `k4LCIOReader` interface conform to `podio::IReader` again, after [AIDASoft/podio#323](https://github.com/AIDASoft/podio/pull/323)
+    - The newly added functions are just stubs for the moment.
+
 # v00.04.02
 
 * 2022-06-16 Thomas Madlener ([PR#25](https://github.com/key4hep/k4lcioreader/pull/25))
