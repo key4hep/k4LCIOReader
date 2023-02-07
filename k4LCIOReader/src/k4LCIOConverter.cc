@@ -79,7 +79,7 @@ void k4LCIOConverter::set(EVENT::LCEvent *evt)
     }
 }
 
-podio::CollectionBase *k4LCIOConverter::getCollection(const std::string &name)
+podio::CollectionBase *k4LCIOConverter::getCollection(const std::string &name, bool add_to_map)
 {
     // if already exist
     auto idest = m_name2dest.find(name);
@@ -122,10 +122,15 @@ podio::CollectionBase *k4LCIOConverter::getCollection(const std::string &name)
       dest = (this->*(it->second))(src);
       dest->setID(m_table->add(name));
 
-      // put result in data holders
-      m_name2dest[name] = dest;
+      if (add_to_map) {
+        // put result in data holders
+        m_name2dest[name] = dest;
 
-      m_type2cols[src->getTypeName()].push_back(std::make_pair(src, dest));
+        m_type2cols[src->getTypeName()].push_back(std::make_pair(src, dest));
+      }
+      else {
+        delete dest;
+      }
     } catch (std::runtime_error& re) {
       std::cout << re.what() << std::endl;
     }
@@ -205,7 +210,7 @@ podio::CollectionBase *k4LCIOConverter::cnvSimTrackerHitCollection(EVENT::LCColl
     // get all collections that this collection depends on
     for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
         if (v.second->getTypeName() == "MCParticle")
-            getCollection(v.first);
+            getCollection(v.first, false);
     });
 
     // fill the collection
@@ -269,7 +274,7 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackerHitCollection(EVENT::LCCollect
     // get all collections that this collection depends on
     for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
         if (v.second->getTypeName() == "TPCHit")
-            getCollection(v.first);
+            getCollection(v.first, false);
     });
 
     // fill the collection
@@ -315,7 +320,7 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackerHitPlaneCollection(EVENT::LCCo
     // get all collections that this collection depends on
     for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
         if (v.second->getTypeName() == "TPCHit")
-            getCollection(v.first);
+            getCollection(v.first, false);
     });
 
     // fill the collection
@@ -366,7 +371,7 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackCollection(EVENT::LCCollection *
     // get all collections that this collection depends on
     for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
         if (v.second->getTypeName() == "TrackerHit")
-            getCollection(v.first);
+            getCollection(v.first, false);
     });
 
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
@@ -448,7 +453,7 @@ podio::CollectionBase *k4LCIOConverter::cnvSimCalorimeterHitCollection(EVENT::LC
 
     // get all collections that this collection depends on
     for_each(m_name2src.begin(), m_name2src.end(), [this](auto& v) {
-            if (v.second->getTypeName() == "MCParticle") getCollection(v.first);
+            if (v.second->getTypeName() == "MCParticle") getCollection(v.first, false);
             });
 
     // get the CaloHitContribution collection
@@ -565,7 +570,7 @@ podio::CollectionBase *k4LCIOConverter::cnvClusterCollection(EVENT::LCCollection
 
     // get all collections that this collection depends on
     for_each(m_name2src.begin(), m_name2src.end(), [this](auto& v) {
-            if (v.second->getTypeName() == "CalorimeterHit") getCollection(v.first);
+            if (v.second->getTypeName() == "CalorimeterHit") getCollection(v.first, false);
             });
 
     // get the ParticleID collection
@@ -686,12 +691,14 @@ podio::CollectionBase *k4LCIOConverter::cnvReconstructedParticleCollection(EVENT
 
     // get all collections that this collection depends on
     for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
-        if (v.second->getTypeName() == "Cluster")
-            getCollection(v.first);
+        if (v.second->getTypeName() == "Cluster") {
+            getCollection(v.first, false);
+        }
     });
     for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
-        if (v.second->getTypeName() == "Track")
-            getCollection(v.first);
+        if (v.second->getTypeName() == "Track") {
+            getCollection(v.first, false);
+        }
     });
     // get the ParticleID collection
     if ( m_name2dest.find("ParticleID_EXT") == m_name2dest.end() ) {
@@ -821,11 +828,11 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         // get all collections that this collection depends on
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
             if (v.second->getTypeName() == "MCParticle")
-                getCollection(v.first);
+                getCollection(v.first, false);
         });
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
             if (v.second->getTypeName() == "ReconstructedParticle")
-                getCollection(v.first);
+                getCollection(v.first, false);
         });
 
         auto dest = new edm4hep::MCRecoParticleAssociationCollection();
@@ -859,11 +866,11 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         // get all collections that this collection depends on
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
             if (v.second->getTypeName() == "CalorimeterHit")
-                getCollection(v.first);
+                getCollection(v.first, false);
         });
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
             if (v.second->getTypeName() == "SimCalorimeterHit")
-                getCollection(v.first);
+                getCollection(v.first, false);
         });
 
         auto dest = new edm4hep::MCRecoCaloAssociationCollection();
@@ -897,11 +904,11 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         // get all collections that this collection depends on
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
             if (v.second->getTypeName() == "TrackerHitPlane")
-                getCollection(v.first);
+                getCollection(v.first, false);
         });
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
             if (v.second->getTypeName() == "SimTrackerHit")
-                getCollection(v.first);
+                getCollection(v.first, false);
         });
 
         auto dest = new edm4hep::MCRecoTrackerHitPlaneAssociationCollection();
@@ -935,11 +942,11 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         // get all collections that this collection depends on
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
             if (v.second->getTypeName() == "Cluster")
-                getCollection(v.first);
+                getCollection(v.first, false);
         });
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
             if (v.second->getTypeName() == "MCParticle")
-                getCollection(v.first);
+                getCollection(v.first, false);
         });
 
         auto dest = new edm4hep::MCRecoClusterParticleAssociationCollection();
@@ -973,11 +980,11 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         // get all collections that this collection depends on
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
             if (v.second->getTypeName() == "Track")
-                getCollection(v.first);
+                getCollection(v.first, false);
         });
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
             if (v.second->getTypeName() == "MCParticle")
-                getCollection(v.first);
+                getCollection(v.first, false);
         });
 
         auto dest = new edm4hep::MCRecoTrackParticleAssociationCollection();
@@ -1011,11 +1018,11 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         // get all collections that this collection depends on
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
             if (v.second->getTypeName() == "TrackerHit")
-                getCollection(v.first);
+                getCollection(v.first, false);
         });
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
             if (v.second->getTypeName() == "SimTrackerHit")
-                getCollection(v.first);
+                getCollection(v.first, false);
         });
 
         auto dest = new edm4hep::MCRecoTrackerAssociationCollection();
@@ -1049,11 +1056,11 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
         // get all collections that this collection depends on
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
             if (v.second->getTypeName() == "CalorimeterHit")
-                getCollection(v.first);
+                getCollection(v.first, false);
         });
         for_each(m_name2src.begin(), m_name2src.end(), [this](auto &v) {
             if (v.second->getTypeName() == "MCParticle")
-                getCollection(v.first);
+                getCollection(v.first, false);
         });
 
         auto dest = new edm4hep::MCRecoCaloParticleAssociationCollection();
