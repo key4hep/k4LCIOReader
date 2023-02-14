@@ -242,7 +242,7 @@ podio::CollectionBase *k4LCIOConverter::cnvSimTrackerHitCollection(EVENT::LCColl
 
 podio::CollectionBase *k4LCIOConverter::cnvTPCHitCollection(EVENT::LCCollection *src)
 {
-    auto dest = new edm4hep::TPCHitCollection();
+    auto dest = new edm4hep::RawTimeSeriesCollection();
 
     for (unsigned i = 0, N = src->getNumberOfElements(); i < N; ++i)
     {
@@ -295,7 +295,7 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackerHitCollection(EVENT::LCCollect
         for (auto &robj : robjvec)
         {
             auto lobj =
-                getCorresponding<edm4hep::TPCHit, edm4hep::TPCHitCollection,
+                getCorresponding<edm4hep::RawTimeSeries, edm4hep::RawTimeSeriesCollection,
                                  EVENT::LCObject>("TPCHit", robj);
             if (lobj.isAvailable())
             {
@@ -345,7 +345,7 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackerHitPlaneCollection(EVENT::LCCo
         for (auto &robj : robjvec)
         {
             auto lobj =
-                getCorresponding<edm4hep::TPCHit, edm4hep::TPCHitCollection,
+                getCorresponding<edm4hep::RawTimeSeries, edm4hep::RawTimeSeriesCollection,
                                  EVENT::LCObject>("TPCHit", robj);
             if (lobj.isAvailable())
             {
