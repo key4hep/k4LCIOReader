@@ -59,7 +59,7 @@ StatusCode LCIOInput::initialize()
         }
         else if ( colType == "TPCHit" ) {
             m_dataHandles[colName] =
-                new DataHandle<edm4hep::TPCHitCollection>(colName, Gaudi::DataHandle::Writer, this);
+                new DataHandle<edm4hep::RawTimeSeriesCollection>(colName, Gaudi::DataHandle::Writer, this);
         }
         else if ( colType == "TrackerHit" ) {
             m_dataHandles[colName] =
@@ -155,7 +155,7 @@ StatusCode LCIOInput::execute()
                 registCollection<edm4hep::SimTrackerHitCollection>(colName);
             }
             else if ( colType == "TPCHit" ) {
-                registCollection<edm4hep::TPCHitCollection>(colName);
+                registCollection<edm4hep::RawTimeSeriesCollection>(colName);
             }
             else if ( colType == "TrackerHit" ) {
                 registCollection<edm4hep::TrackerHitCollection>(colName);
