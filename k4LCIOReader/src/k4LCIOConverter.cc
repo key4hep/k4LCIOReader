@@ -255,7 +255,7 @@ podio::CollectionBase *k4LCIOConverter::cnvTPCHitCollection(EVENT::LCCollection 
         lval.setQuality(rval->getQuality());
         for (unsigned j = 0, M = rval->getNRawDataWords(); j < M; j++)
         {
-            lval.addToRawDataWords(rval->getRawDataWord(j));
+            lval.addToAdcCounts(rval->getRawDataWord(j));
         }
     }
 
