@@ -18,7 +18,7 @@ public:
 
     void set(EVENT::LCEvent *evt);
 
-    podio::CollectionBase *getCollection(const std::string &name);
+    podio::CollectionBase *getCollection(const std::string &name, bool add_to_map=true);
 
 private:
     // convertion functions
