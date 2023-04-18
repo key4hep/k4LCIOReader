@@ -1,3 +1,11 @@
+# v00.05
+
+* 2023-03-02 jmcarcell ([PR#29](https://github.com/key4hep/k4LCIOReader/pull/29))
+  - Rename TPCHit -> RawTimeSeries
+
+* 2023-02-27 jmcarcell ([PR#28](https://github.com/key4hep/k4LCIOReader/pull/28))
+  - Fix a memory leak due to collections not being deleted
+
 # v00.04.03
 
 * 2022-09-21 Thomas Madlener ([PR#27](https://github.com/key4hep/k4lcioreader/pull/27))
