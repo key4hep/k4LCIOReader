@@ -54,6 +54,9 @@ private:
     std::map<std::string, EVENT::LCCollection *> m_name2src;
     std::map<std::string, podio::CollectionBase *> m_name2dest;
 
+    //Collection Name to Collection, for collections that are maybe not needed
+    std::map<std::string, podio::CollectionBase *> m_name2dest_tmp;
+
     typedef std::pair<EVENT::LCCollection *, podio::CollectionBase *> CollectionPair;
     // key: collection type, value: corresponding collection pairs
     std::map<std::string, std::vector<CollectionPair>> m_type2cols;
