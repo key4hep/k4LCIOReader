@@ -63,6 +63,7 @@ k4LCIOConverter::k4LCIOConverter(podio::CollectionIDTable *table)
 
 k4LCIOConverter::~k4LCIOConverter()
 {
+    set(nullptr);
 }
 
 void k4LCIOConverter::set(EVENT::LCEvent *evt)
@@ -75,6 +76,10 @@ void k4LCIOConverter::set(EVENT::LCEvent *evt)
         delete pair.second;
     }
     m_name2dest_tmp.clear();
+
+    if(not evt){
+      return;
+    }
 
     m_evt = evt;
     for (const auto &colname : *(evt->getCollectionNames()))
@@ -93,13 +98,18 @@ podio::CollectionBase *k4LCIOConverter::getCollection(const std::string &name, b
         return idest->second;
     }
     idest = m_name2dest_tmp.find(name);
-    if (idest != m_name2dest_tmp.end())
+    if (idest != m_name2dest_tmp.end() && add_to_map)
     {
         const auto name = idest->first;
         auto* dest = idest->second;
         m_name2dest[name] = dest;
         m_name2dest_tmp.erase(idest);
         return m_name2dest[name];
+    }
+    else if (idest != m_name2dest_tmp.end() && not add_to_map)
+    {
+        const auto name = idest->first;
+        return idest->second;
     }
 
     // in case of EventHeader
