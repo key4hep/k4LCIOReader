@@ -71,6 +71,11 @@ void k4LCIOConverter::set(EVENT::LCEvent *evt)
     m_name2dest.clear();
     m_type2cols.clear();
 
+    for (auto pair: m_name2dest_tmp) {
+        delete pair.second;
+    }
+    m_name2dest_tmp.clear();
+
     m_evt = evt;
     for (const auto &colname : *(evt->getCollectionNames()))
     {
@@ -86,6 +91,15 @@ podio::CollectionBase *k4LCIOConverter::getCollection(const std::string &name, b
     if (idest != m_name2dest.end())
     {
         return idest->second;
+    }
+    idest = m_name2dest_tmp.find(name);
+    if (idest != m_name2dest_tmp.end())
+    {
+        const auto name = idest->first;
+        auto* dest = idest->second;
+        m_name2dest[name] = dest;
+        m_name2dest_tmp.erase(idest);
+        return m_name2dest[name];
     }
 
     // in case of EventHeader
@@ -125,11 +139,11 @@ podio::CollectionBase *k4LCIOConverter::getCollection(const std::string &name, b
       if (add_to_map) {
         // put result in data holders
         m_name2dest[name] = dest;
-
         m_type2cols[src->getTypeName()].push_back(std::make_pair(src, dest));
       }
       else {
-        delete dest;
+        m_name2dest_tmp[name] = dest;
+        m_type2cols[src->getTypeName()].push_back(std::make_pair(src, dest));
       }
     } catch (std::runtime_error& re) {
       std::cout << re.what() << std::endl;
