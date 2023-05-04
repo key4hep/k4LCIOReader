@@ -141,11 +141,15 @@ podio::CollectionBase *k4LCIOConverter::getCollection(const std::string &name, b
       if (add_to_map) {
         // put result in data holders
         m_name2dest[name] = dest;
-        m_type2cols[src->getTypeName()].push_back(std::make_pair(src, dest));
+        if (src->isSubset() == false) {
+            m_type2cols[src->getTypeName()].push_back(std::make_pair(src, dest));
+        }
       }
       else {
         m_name2dest_tmp[name] = std::unique_ptr<podio::CollectionBase>(dest);
-        m_type2cols[src->getTypeName()].push_back(std::make_pair(src, dest));
+        if (src->isSubset() == false) {
+            m_type2cols[src->getTypeName()].push_back(std::make_pair(src, dest));
+        }
       }
     } catch (std::runtime_error& re) {
       std::cout << re.what() << std::endl;
@@ -866,12 +870,16 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
                 getCorresponding<edm4hep::ReconstructedParticle, edm4hep::ReconstructedParticleCollection,
                                  EVENT::ReconstructedParticle>("ReconstructedParticle", rFrom);
             lval.setRec(lFrom);
+            auto from_oID = lFrom.getObjectID();
+            std::cout << "[GAUDIISTDOOF] lFrom collID: " << from_oID.collectionID << " index: " << from_oID.index << std::endl;
 
             auto rTo = (EVENT::MCParticle *)rval->getTo();
             auto lTo =
                 getCorresponding<edm4hep::MCParticle, edm4hep::MCParticleCollection,
                                  EVENT::MCParticle>("MCParticle", rTo);
             lval.setSim(lTo);
+            auto to_oID = lTo.getObjectID();
+            std::cout << "[GAUDIISTDOOF] lTo collID: " << to_oID.collectionID << " index: " << to_oID.index << std::endl;
 
             lval.setWeight(rval->getWeight());
         }
