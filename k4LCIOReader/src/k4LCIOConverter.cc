@@ -870,16 +870,12 @@ podio::CollectionBase *k4LCIOConverter::cnvAssociationCollection(EVENT::LCCollec
                 getCorresponding<edm4hep::ReconstructedParticle, edm4hep::ReconstructedParticleCollection,
                                  EVENT::ReconstructedParticle>("ReconstructedParticle", rFrom);
             lval.setRec(lFrom);
-            auto from_oID = lFrom.getObjectID();
-            std::cout << "[GAUDIISTDOOF] lFrom collID: " << from_oID.collectionID << " index: " << from_oID.index << std::endl;
 
             auto rTo = (EVENT::MCParticle *)rval->getTo();
             auto lTo =
                 getCorresponding<edm4hep::MCParticle, edm4hep::MCParticleCollection,
                                  EVENT::MCParticle>("MCParticle", rTo);
             lval.setSim(lTo);
-            auto to_oID = lTo.getObjectID();
-            std::cout << "[GAUDIISTDOOF] lTo collID: " << to_oID.collectionID << " index: " << to_oID.index << std::endl;
 
             lval.setWeight(rval->getWeight());
         }
