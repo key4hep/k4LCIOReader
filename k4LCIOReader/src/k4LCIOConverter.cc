@@ -41,6 +41,14 @@
 #include "edm4hep/MCRecoClusterParticleAssociationCollection.h"
 #include "edm4hep/MCRecoTrackParticleAssociationCollection.h"
 #include "edm4hep/RecoParticleVertexAssociationCollection.h"
+#if __has_include("edm4hep/EDM4hepVersion.h")
+#include "edm4hep/EDM4hepVersion.h"
+#else
+// Copy the necessary parts from  the header above to make whatever we need to work here
+#define EDM4HEP_VERSION(major, minor, patch) ((UINT64_C(major) << 32) | (UINT64_C(minor) << 16) | (UINT64_C(patch)))
+// v00-09 is the last version without the capitalization change of the track vector members
+#define EDM4HEP_BUILD_VERSION EDM4HEP_VERSION(0, 9, 0)
+#endif
 
 k4LCIOConverter::k4LCIOConverter(podio::CollectionIDTable *table)
     : m_table(table)
@@ -422,7 +430,11 @@ podio::CollectionBase *k4LCIOConverter::cnvTrackCollection(EVENT::LCCollection *
         // add Sub-detector numbers
         for (auto v : rval->getSubdetectorHitNumbers())
         {
+#if EDM4HEP_BUILD_VERSION > EDM4HEP_VERSION(0, 9, 0)
+            lval.addToSubdetectorHitNumbers(v);
+#else
             lval.addToSubDetectorHitNumbers(v);
+#endif
         }
 
         // fill the TrackStates
